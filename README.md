@@ -1,11 +1,11 @@
-# Set Up
+# Onboarding Set Up
 
 ## Prerequisites
 1. Clone the repo from github
 
 2. Open Powershell and go to project root
 
-3. Powershell: Start virtual environment
+3. Start virtual environment
     ```bash
     python -m venv .venv 
     .\.venv\Scripts\activate 
@@ -28,12 +28,12 @@
 3. Test flask
     ```bash
     flask run
-should see: * Running on http://127.0.0.1:5001
+- should see: * Running on http://127.0.0.1:5001
 
 4. Test api
     ``` bash
-    Run: curl.exe http://127.0.0.1:5001/api/users/me
-Or visit http://127.0.0.1:5001/api/users/me 
+    curl.exe http://127.0.0.1:5001/api/users/me
+- Or visit http://127.0.0.1:5001/api/users/me 
 
 
 ## Set up Docker
@@ -44,7 +44,7 @@ Or visit http://127.0.0.1:5001/api/users/me
 2. Turn on the engine
     ```bash
     Start-Process "$Env:ProgramFiles\Docker\Docker\Docker Desktop.exe"
-Or go into the app and turn it on
+- Or go into the app and turn it on
     
 3. Verify engine is connected
     ```bash
@@ -53,7 +53,7 @@ Or go into the app and turn it on
 4. Onboard to app database
     ```bash
     docker pull postgres:16      
-first-time only (needs internet once, then can local dev after)
+- first-time only (needs internet once, then can local dev after)
     
 5. Test running the db
     ```bash
