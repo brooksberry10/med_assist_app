@@ -5,6 +5,8 @@ USE med_assist;
 
 CREATE TABLE User (
     user_id INT AUTO_INCREMENT PRIMARY KEY,
+    first_name VARCHAR(30),
+    last_name VARCHAR(30),
     email VARCHAR(50) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
     age INT,
@@ -16,23 +18,32 @@ CREATE TABLE User (
     );
 
 CREATE TABLE daily_symptoms (
-    severity VARCHAR(20)
-    type VARCHAR(20)
-    weight_lbs FLOAT
-    notes VARCHAR(1000)
+    symptoms_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    severity INT,
+    type_of_symptom VARCHAR(20),
+    weight_lbs FLOAT,
+    notes VARCHAR(1000),
+    FOREIGN KEY (user_id) REFERENCES User(user_id) ON DELETE CASCADE
 );
 
 --log daily food intake to track symptom reactions related to food
 CREATE TABLE food_log (
-    breakfast VARCHAR(100)
-    lunch VARCHAR(100)
-    dinner VARCHAR(100)
-    notes VARCHAR(1000)
-    total calories FLOAT
+    foodlog_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    breakfast VARCHAR(100),
+    lunch VARCHAR(100),
+    dinner VARCHAR(100),
+    notes VARCHAR(1000),
+    total calories FLOAT,
+    FOREIGN KEY (user_id) REFERENCES User(user_id) ON DELETE CASCADE
 );
 
 CREATE TABLE labs (
+    lab_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
     bloodpressure VARCHAR(100)
+    FOREIGN KEY (user_id) REFERENCES User(user_id) ON DELETE CASCADE
     --not finished
 
 );

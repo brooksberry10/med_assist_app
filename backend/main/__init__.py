@@ -1,6 +1,5 @@
 from flask import Flask
 from .config import Config
-from .routes import bp as api_bp
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
@@ -8,8 +7,16 @@ db = SQLAlchemy()
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
+    app.json.sort_keys = False
     db.init_app(app)
+
+    from .routes import bp as api_bp
+
     app.register_blueprint(api_bp)
+
+    with app.app_context():
+        db.drop_all()
+        db.create_all()
 
     @app.get("/")
     def root():
