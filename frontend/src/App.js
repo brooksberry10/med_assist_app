@@ -1,25 +1,19 @@
-import logo from './logo.svg';
-import './App.css';
+import { useEffect, useState } from "react";
 
-function App() {
+export default function App() {
+  const [text, setText] = useState("loading...");
+
+  useEffect(() => {
+    fetch("/api/users/me")
+      .then((r) => r.text())
+      .then(setText)
+      .catch((e) => setText("error: " + e.message));
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div style={{ padding: 24 }}>
+      <h1>Med Assist</h1>
+      <p>{text}</p>
     </div>
   );
 }
-
-export default App;
