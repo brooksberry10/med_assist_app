@@ -49,10 +49,17 @@ def add_user():
 
 
 #GET - USER INFORMATION
-@bp.route('/user)
+@bp.route('/user/<int:user_it>/info', methods = ['GET'])
+def get_user_info(user_id):
+    pass
+        
 
 
 #POST - USER INFORMATION
+@bp.route('/user/<int:user_it>/info', methods = ['POST'])
+def add_user_info(user_id):
+    pass
+    
 
 # GET - SYMPTOMS
 @bp.route('/user/<int:user_id>/symptoms', methods = ['GET'])
