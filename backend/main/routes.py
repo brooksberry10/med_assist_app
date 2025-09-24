@@ -6,7 +6,7 @@ from . import db
 bp = Blueprint('api', __name__, url_prefix='/api')
 
 # GET - USERS
-@bp.route('/users', methods = ['GET'])
+@bp.route('/user', methods = ['GET'])
 def get_users():
     users = User.query.all()
     users_list = []
@@ -15,19 +15,19 @@ def get_users():
             'user_id': user.user_id,
             'first_name': user.first_name,
             'last_name': user.last_name,
-            'email': user.email,
-            'age':user.age,
-            'gender': user.gender,
-            'weight_lbs': user.weight_lbs,
-            'height_ft': user.height_ft,
-            'current_diagnoses': user.current_diagnoses,
-            'medical_history': user.medical_history,
+            'email': user.email
+            # 'age':user.age,
+            # 'gender': user.gender,
+            # 'weight_lbs': user.weight_lbs,
+            # 'height_ft': user.height_ft,
+            # 'current_diagnoses': user.current_diagnoses,
+            # 'medical_history': user.medical_history,
         })
 
     return jsonify(users_list)
 
 # POST - USERS
-@bp.route('/users', methods = ['POST'])
+@bp.route('/user', methods = ['POST'])
 def add_user():
     data = request.get_json()
 
@@ -35,20 +35,27 @@ def add_user():
         first_name = data['first_name'],
         last_name = data['last_name'],
         email = data['email'],
-        password = data['password'],
-        age = data.get('age'),
-        gender = data.get('gender'),
-        weight_lbs = data.get('weight_lbs'),
-        height_ft = data.get('height_ft'),
-        current_diagnoses = data.get('current_diagnoses'),
-        medical_history = data.get('medical_history')
+        password = data['password']
+        # age = data.get('age'),
+        # gender = data.get('gender'),
+        # weight_lbs = data.get('weight_lbs'),
+        # height_ft = data.get('height_ft'),
+        # current_diagnoses = data.get('current_diagnoses'),
+        # medical_history = data.get('medical_history')
     )
     db.session.add(new_user)
     db.session.commit()
     return jsonify({"message": "User created successfully"}), 201
 
+
+#GET - USER INFORMATION
+@bp.route('/user)
+
+
+#POST - USER INFORMATION
+
 # GET - SYMPTOMS
-@bp.route('/users/<int:user_id>/symptoms', methods = ['GET'])
+@bp.route('/user/<int:user_id>/symptoms', methods = ['GET'])
 def get_symptoms(user_id):
     user = User.query.get(user_id)
     if not user:
@@ -66,7 +73,7 @@ def get_symptoms(user_id):
     return jsonify(symptoms_list)
 
 # POST - SYMPTOMS
-@bp.route('/users/<int:user_id>/symptoms', methods = ['POST'])
+@bp.route('/user/<int:user_id>/symptoms', methods = ['POST'])
 def add_symptoms(user_id):
     try:
         user = User.query.get(user_id)
@@ -89,7 +96,7 @@ def add_symptoms(user_id):
         return jsonify({"error": "Failed to log symptom"}), 500
 
 # GET - FOOD LOGS
-@bp.route('/users/<int:user_id>/food-logs', methods = ['GET'])
+@bp.route('/user/<int:user_id>/food-logs', methods = ['GET'])
 def get_foodlogs(user_id):
     user = User.query.get(user_id)
 
@@ -110,7 +117,7 @@ def get_foodlogs(user_id):
     return jsonify(foodlog_list)
     
 # POST - FOOD LOGS
-@bp.route('/users/<int:user_id>/food-logs', methods = ['POST'])
+@bp.route('/user/<int:user_id>/food-logs', methods = ['POST'])
 def add_foodlog(user_id):
     try:
         user = User.query.get(user_id)

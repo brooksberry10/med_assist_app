@@ -4,12 +4,12 @@ GET http://localhost:5001/
 ###
 
 ### Get All Users (should be empty initially)
-GET http://localhost:5001/api/users
+GET http://localhost:5001/api/user
 
 ###
 
 ### Add a New User
-POST http://localhost:5001/api/users
+POST http://localhost:5001/api/user
 Content-Type: application/json
 
 {
@@ -28,7 +28,7 @@ Content-Type: application/json
 ###
 
 ### Add Another User
-POST http://localhost:5001/api/users
+POST http://localhost:5001/api/user
 Content-Type: application/json
 
 {
@@ -44,12 +44,12 @@ Content-Type: application/json
 ###
 
 ### Get All Users Again (should show the users we added)
-GET http://localhost:5001/api/users
+GET http://localhost:5001/api/user
 
 ###
 
 ### Test Error - Missing Password (should fail)
-POST http://localhost:5001/api/users
+POST http://localhost:5001/api/user
 Content-Type: application/json
 
 {
@@ -61,7 +61,7 @@ Content-Type: application/json
 ###
 
 ### Test Error - Duplicate Email (should fail)
-POST http://localhost:5001/api/users
+POST http://localhost:5001/api/user
 Content-Type: application/json
 
 {
@@ -78,7 +78,7 @@ Content-Type: application/json
 ###
 
 ### Add Symptom for User 1
-POST http://localhost:5001/api/users/1/symptoms
+POST http://localhost:5001/api/user/1/symptoms
 Content-Type: application/json
 
 {
@@ -91,16 +91,16 @@ Content-Type: application/json
 ###
 
 ### Get Symptoms for User 1
-GET http://localhost:5001/api/users/1/symptoms
+GET http://localhost:5001/api/user/1/symptoms
 
 ###
 
 ### Get All Users Again (should show the users we added with symptoms)
-GET http://localhost:5001/api/users
+GET http://localhost:5001/api/user
 ###
 
 ### Add Food Log for User 1
-POST http://localhost:5001/api/users/1/food-logs
+POST http://localhost:5001/api/user/1/food-logs
 Content-Type: application/json
 
 {
@@ -114,12 +114,12 @@ Content-Type: application/json
 ###
 
 ## Get Food_logs for User 1
-GET http://localhost:5001/api/users/1/food-logs
+GET http://localhost:5001/api/user/1/food-logs
 
 ###
 
 
 ### Get All Users Again (should show the users we added with symptoms and food logs)
-GET http://localhost:5001/api/users
+GET http://localhost:5001/api/user
 
 ###

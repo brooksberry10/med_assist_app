@@ -15,7 +15,7 @@ def create_app():
     app.register_blueprint(api_bp)
 
     with app.app_context():
-        db.drop_all()
+        db.drop_all() #temporary
         db.create_all()
 
     @app.get("/")

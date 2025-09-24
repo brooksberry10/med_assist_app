@@ -21,6 +21,7 @@ class UserInfo(db.Model):
     height_ft = db.Column(db.Float)
     current_diagnoses = db.Column(db.String(1000))
     medical_history = db.Column(db.String(1000))
+    
 class DailySymptoms(db.Model):
     symptoms_id = db.Column(db.Integer, primary_key = True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'), nullable = False)
