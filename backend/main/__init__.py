@@ -1,14 +1,17 @@
 from flask import Flask
 from .config import Config
 from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager
 
 db = SQLAlchemy()
+login = LoginManager()
 
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
     app.json.sort_keys = False
     db.init_app(app)
+    login.init_app(app)
 
     from .routes import bp as api_bp
 
