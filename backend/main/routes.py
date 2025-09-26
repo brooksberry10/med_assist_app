@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from flask_login import current_user, login_user, logout_user
 from .models import User, DailySymptoms, FoodLog, Labs
 from .forms import RegistrationForm, LoginForm
-from flask_jwt_extended import create_access_token, create_refresh_token
+from flask_jwt_extended import create_access_token, create_refresh_token,jwt_required
 from . import db
 
 #api will be the base path for backend to prevent frontend collisions
@@ -78,21 +78,46 @@ def logout():
 
 
 
-# GET - USER
+# GET - A USER
 @bp.route('/user/<int:id>', methods = ['GET'])
 def get_user(id):
     user = User.query.filter_by(id=id).first()
 
     if user:
-        user_info = {
+        user_required_info = {
                 'id': user.id,
                 'first_name': user.first_name,
                 'last_name': user.last_name,
                 'email': user.email}
 
-        return jsonify(user_info),200
+        return jsonify(user_required_info),200
     else:
         return jsonify({"error": "User does not exist"}),404
+
+# GET - A PAGE OF USERS(PAGINATED) NEED TO BE AUTHORIZED (LOGGED IN) TO VEIW
+@bp.route('/users/all',methods = ['GET'])
+@jwt_required()
+def get_all_users():
+    
+    page = request.args.get('page', default=1, type=int)
+    per_page =  request.args.get('per_page', default=20, type=int)
+
+    user_list = []
+    query = User.query.order_by(User.id)
+    users = db.paginate(query, page=page, per_page=per_page, error_out=False).items
+
+    for user in users:
+        user_list.append({
+            "id": user.id,
+            "first_name": user.first_name,
+            "last_name":user.last_name,
+            "email": user.email
+        })
+
+    return jsonify({
+        "users": user_list
+    }), 200
+
 
 # GET - SYMPTOMS
 @bp.route('/user/<int:id>/symptoms', methods = ['GET'])

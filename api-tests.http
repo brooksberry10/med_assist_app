@@ -235,9 +235,9 @@ POST {{baseUrl}}/api/register
 Content-Type: application/json
 
 {
-  "first_name": "Test",
-  "last_name": "User",
-  "email": "test.loggedin@example.com",
+  "first_name": "Test22",
+  "last_name": "User44",
+  "email": "zddaad-in@exdwalddwdwed.com",
   "password": "TestPassword123",
   "confirm_password": "TestPassword123"
 }
@@ -264,13 +264,22 @@ Content-Type: application/json
 
 {
   "first_name": "Mary-Jane",
-  "last_name": "O'Connor",
-  "email": "mary.jane@test.com",
+  "last_name": "O'Conor",
+  "email": "marjaad1ae@test.com",
   "password": "TestPassword123",
   "confirm_password": "TestPassword123"
 }
 
-###
+### LOGIN MARY-JANE
+
+POST {{baseUrl}}/api/login
+Content-Type: application/json
+
+{
+  "email": "marjaad1ae@test.com",
+  "password": "TestPassword123"
+}
+
 
 ### Test Whitespace Handling
 POST {{baseUrl}}/api/register
@@ -296,3 +305,16 @@ Content-Type: application/json
 }
 
 ###
+
+### TEST PAGINATION OF ALL USERS
+
+GET {{baseUrl}}/api/users/all?page=2
+Content-Type: application/json
+
+### REGISTER AND LOGIN MARY_JANE THEN TEST SITE AUTHORIZATION WITH TOKEN
+GET {{baseUrl}}/api/users/all?page=1
+Content-Type: application/json
+Authorization: Bearer PASTE ACCESS TOKEN HERE
+
+####
+

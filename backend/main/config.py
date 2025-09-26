@@ -10,7 +10,8 @@ class Config:
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
+
     SECRET_KEY = os.environ.get('FLASK_JWT_SECRET_KEY')
 
     #set to false when testing api until csrf is made for users
-    #WTF_CSRF_ENABLED = False #TEMPORARY
+    # WTF_CSRF_ENABLED = False #TEMPORARY
