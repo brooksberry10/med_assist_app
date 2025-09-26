@@ -2,10 +2,12 @@ from flask import Flask
 from .config import Config
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
+from flask_jwt_extended import JWTManager
 import wtforms_json
 
 db = SQLAlchemy()
 login = LoginManager()
+jwt = JWTManager()
 
 def create_app():
     app = Flask(__name__)
@@ -14,6 +16,7 @@ def create_app():
     db.init_app(app)
     login.init_app(app)
     wtforms_json.init()
+    jwt.init_app(app)
     
 
     from .routes import bp as api_bp

@@ -2,44 +2,12 @@ from flask import Blueprint, request, jsonify
 from flask_login import current_user, login_user, logout_user
 from .models import User, DailySymptoms, FoodLog, Labs
 from .forms import RegistrationForm, LoginForm
+from flask_jwt_extended import create_access_token, create_refresh_token
 from . import db
 
 #api will be the base path for backend to prevent frontend collisions
 bp = Blueprint('api', __name__, url_prefix='/api')
 
-
-#LOGIN USER AND POSSIBLE 'REMEMBER ME' FUNCTIONALITY
-@bp.route('/login', methods = ['POST'])
-def login():
-    if current_user.is_authenticated:
-        return jsonify({"message": "Already logged in"}),200
-    
-    data = request.get_json()
-    if not data:
-        return jsonify({"error": "No data provided"}),400
-
-    if not data.get('email') or not data.get('password'):
-        return jsonify({"error": "Email and password are required!"}), 400
-    
-    form = LoginForm.from_json(data = data)
-
-    if form.validate_on_submit():
-        user = User.query.filter_by(email = form.email.data).first()
-
-        if user and user.check_password(password = form.password.data):
-            login_user(user)
-            return jsonify({"message": "Login Successful"}),200
-        
-        return jsonify({"error":"Invalid email or password"}),401
-    else:
-        return jsonify({"error": form.errors}), 400
-        
-
-#LOGOUT USER - Flask_login handles this
-@bp.route('/logout')
-def logout():
-    logout_user()
-    return jsonify({"message": "Logged Out Successfully",})
 
 
 #USER REGISTRATION
@@ -67,6 +35,49 @@ def register():
         return jsonify({"error": form.errors}), 400
 
 
+#LOGIN USER AND POSSIBLE 'REMEMBER ME' FUNCTIONALITY
+@bp.route('/login', methods = ['POST'])
+def login():
+    if current_user.is_authenticated:
+        return jsonify({"message": "Already logged in"}),200
+    
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "No data provided"}),400
+
+    if not data.get('email') or not data.get('password'):
+        return jsonify({"error": "Email and password are required!"}), 400
+    
+    form = LoginForm.from_json(data = data)
+
+    if form.validate_on_submit():
+        user = User.query.filter_by(email = form.email.data).first()
+
+        if user and user.check_password(password = form.password.data):
+            access_token = create_access_token(identity=user.email)
+            refresh_token = create_refresh_token(identity=user.email)
+            login_user(user)
+            return jsonify({"message": "Login Successful",
+                            "tokens": {
+                                "access": access_token,
+                                "refresh": refresh_token
+                                }
+                                
+                            }),200
+        
+        return jsonify({"error":"Invalid email or password"}),401
+    else:
+        return jsonify({"error": form.errors}), 400
+        
+
+#LOGOUT USER - Flask_login handles this
+@bp.route('/logout')
+def logout():
+    logout_user()
+    return jsonify({"message": "Logged Out Successfully",}),200
+
+
+
 # GET - USER
 @bp.route('/user/<int:id>', methods = ['GET'])
 def get_user(id):
@@ -79,9 +90,9 @@ def get_user(id):
                 'last_name': user.last_name,
                 'email': user.email}
 
-        return jsonify(user_info)
+        return jsonify(user_info),200
     else:
-        return jsonify({"error": "User does not exist"})
+        return jsonify({"error": "User does not exist"}),404
 
 # GET - SYMPTOMS
 @bp.route('/user/<int:id>/symptoms', methods = ['GET'])
@@ -99,7 +110,7 @@ def get_symptoms(id):
             "weight_lbs" : symptom.weight_lbs,
             "notes": symptom.notes
         })
-    return jsonify(symptoms_list)
+    return jsonify(symptoms_list),200
 
 # POST - SYMPTOMS
 @bp.route('/user/<int:id>/symptoms', methods = ['POST'])

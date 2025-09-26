@@ -2,9 +2,6 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, EmailField, BooleanField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from .models import User
-import wtforms_json
-
-wtforms_json.init()
 
 class RegistrationForm(FlaskForm):
     first_name = StringField('First Name', validators=[DataRequired(), Length(min=1, max=30)])
