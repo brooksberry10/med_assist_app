@@ -9,7 +9,7 @@ bp = Blueprint('api', __name__, url_prefix='/api')
 
 
 
-#USER REGISTRATION
+#USER REGISTRATION #*DONE
 @bp.route('/auth/register', methods = ['POST'])
 def register():
     
@@ -31,7 +31,7 @@ def register():
 
 
 
-#LOGIN USER USING JWT TOKENS
+#LOGIN USER USING JWT TOKENS #*DONE
 @bp.route('/auth/login', methods = ['POST'])
 def login():
 
@@ -62,7 +62,7 @@ def login():
     
         
 
-#LOGOUT USER - Flask_login handles this (GOING TO BE REWORKED)
+#LOGOUT USER - Flask_login handles this (GOING TO BE REWORKED) #*DONE
 @bp.route('/logout/<int:id>')
 def logout(id):
     pass
@@ -84,7 +84,7 @@ def get_user(id):
     else:
         return jsonify({"error": "User does not exist"}),404
 
-# GET - A PAGE OF USERS(PAGINATED) NEED TO BE AUTHORIZED (LOGGED IN) TO VEIW
+# GET - A PAGE OF USERS(PAGINATED) NEED TO BE AUTHORIZED (LOGGED IN) TO VEIW #* DONE
 @bp.route('/users/all',methods = ['GET'])
 @jwt_required()
 def get_all_users():
