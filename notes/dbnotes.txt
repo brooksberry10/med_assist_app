@@ -13,5 +13,5 @@
 TODO:
 - Dont forget to remove db.drop_all() , this is TEMPORARY. Was activated while testing api's and creating multiple users
 - When testing api for login and registering, set WTF_CSRF_ENABLED = False TEMPORARLY until csrf is figured out for users
-
+-
 
