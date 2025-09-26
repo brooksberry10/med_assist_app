@@ -11,7 +11,7 @@ GET http://localhost:5001/api/user/1
 ###
 
 ### Register New User - Valid Data
-POST {{baseUrl}}/api/register
+POST {{baseUrl}}/api/auth/register
 Content-Type: application/json
 
 {
@@ -25,7 +25,7 @@ Content-Type: application/json
 ###
 
 ### Register Another User - Valid Data
-POST {{baseUrl}}/api/register
+POST {{baseUrl}}/api/auth/register
 Content-Type: application/json
 
 {
@@ -45,7 +45,7 @@ GET http://localhost:5001/api/user/1
 ###
 
 ### Register New User - Valid Data
-POST {{baseUrl}}/api/register
+POST {{baseUrl}}/api/auth/register
 Content-Type: application/json
 
 {
@@ -59,7 +59,7 @@ Content-Type: application/json
 ###
 
 ### Register Another User - Valid Data
-POST {{baseUrl}}/api/register
+POST {{baseUrl}}/api/auth/register
 Content-Type: application/json
 
 {
@@ -73,7 +73,7 @@ Content-Type: application/json
 ###
 
 ### Register - Missing Required Fields
-POST {{baseUrl}}/api/register
+POST {{baseUrl}}/api/auth/register
 Content-Type: application/json
 
 {
@@ -84,7 +84,7 @@ Content-Type: application/json
 ###
 
 ### Register - Password Mismatch
-POST {{baseUrl}}/api/register
+POST {{baseUrl}}/api/auth/register
 Content-Type: application/json
 
 {
@@ -98,7 +98,7 @@ Content-Type: application/json
 ###
 
 ### Register - Password Too Short
-POST {{baseUrl}}/api/register
+POST {{baseUrl}}/api/auth/register
 Content-Type: application/json
 
 {
@@ -112,7 +112,7 @@ Content-Type: application/json
 ###
 
 ### Register - Invalid Email Format
-POST {{baseUrl}}/api/register
+POST {{baseUrl}}/api/auth/register
 Content-Type: application/json
 
 {
@@ -126,7 +126,7 @@ Content-Type: application/json
 ###
 
 ### Register - Duplicate Email
-POST {{baseUrl}}/api/register
+POST {{baseUrl}}/api/auth/register
 Content-Type: application/json
 
 {
@@ -140,7 +140,7 @@ Content-Type: application/json
 ###
 
 ### Register - Empty Request Body or Missing field
-POST {{baseUrl}}/api/register
+POST {{baseUrl}}/api/auth/register
 Content-Type: application/json
 
 {
@@ -151,7 +151,7 @@ Content-Type: application/json
 ###
 
 ### Login - Valid Credentials
-POST {{baseUrl}}/api/login
+POST {{baseUrl}}/api/auth/login
 Content-Type: application/json
 
 {
@@ -162,7 +162,7 @@ Content-Type: application/json
 ###
 
 ### Login - Invalid Password
-POST {{baseUrl}}/api/login
+POST {{baseUrl}}/api/auth/login
 Content-Type: application/json
 
 {
@@ -173,7 +173,7 @@ Content-Type: application/json
 ###
 
 ### Login - Non-existent Email
-POST {{baseUrl}}/api/login
+POST {{baseUrl}}/api/auth/login
 Content-Type: application/json
 
 {
@@ -184,7 +184,7 @@ Content-Type: application/json
 ###
 
 ### Login - Missing Email
-POST {{baseUrl}}/api/login
+POST {{baseUrl}}/api/auth/login
 Content-Type: application/json
 
 {
@@ -194,7 +194,7 @@ Content-Type: application/json
 ###
 
 ### Login - Missing Password
-POST {{baseUrl}}/api/login
+POST {{baseUrl}}/api/auth/login
 Content-Type: application/json
 
 {
@@ -204,13 +204,13 @@ Content-Type: application/json
 ###
 
 ### Login - Empty Request Body
-POST {{baseUrl}}/api/login
+POST {{baseUrl}}/api/auth/login
 Content-Type: application/json
 
 ###
 
 ### Login - Already Logged In (Test after successful login)
-POST {{baseUrl}}/api/login
+POST {{baseUrl}}/api/auth/login
 Content-Type: application/json
 
 {
@@ -231,7 +231,7 @@ GET {{baseUrl}}/api/logout
 ###
 
 ### Register While Already Logged In (Test after login)
-POST {{baseUrl}}/api/register
+POST {{baseUrl}}/api/auth/register
 Content-Type: application/json
 
 {
@@ -245,7 +245,7 @@ Content-Type: application/json
 ###
 
 ### Test Edge Cases - Very Long Input
-POST {{baseUrl}}/api/register
+POST {{baseUrl}}/api/auth/register
 Content-Type: application/json
 
 {
@@ -259,7 +259,7 @@ Content-Type: application/json
 ###
 
 ### Test Special Characters in Names
-POST {{baseUrl}}/api/register
+POST {{baseUrl}}/api/auth/register
 Content-Type: application/json
 
 {
@@ -272,7 +272,7 @@ Content-Type: application/json
 
 ### LOGIN MARY-JANE
 
-POST {{baseUrl}}/api/login
+POST {{baseUrl}}/api/auth/login
 Content-Type: application/json
 
 {
@@ -282,7 +282,7 @@ Content-Type: application/json
 
 
 ### Test Whitespace Handling
-POST {{baseUrl}}/api/register
+POST {{baseUrl}}/api/auth/register
 Content-Type: application/json
 
 {
@@ -296,7 +296,7 @@ Content-Type: application/json
 ###
 
 ### Test Case Sensitivity in Email
-POST {{baseUrl}}/api/login
+POST {{baseUrl}}/api/auth/login
 Content-Type: application/json
 
 {

@@ -57,8 +57,8 @@ class Labs(db.Model):
 
 
 ## USER LOADER - keeps track of logged in user
-@login.user_loader
-def load_user(id):
-    return db.session.get(User, int(id)) #flask login passes in string, parse
+# @login.user_loader
+# def load_user(id):
+#     return db.session.get(User, int(id)) #flask login passes in string, parse
 
-##
+# ##

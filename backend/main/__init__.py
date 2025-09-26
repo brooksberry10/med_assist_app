@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, jsonify    
 from .config import Config
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
@@ -27,6 +27,23 @@ def create_app():
         db.drop_all() #temporary
         db.create_all()
 
+
+    @jwt.expired_token_loader
+    def expired_token_callback(jwt_header, jwt_data):
+        return jsonify({"message": "Token has expired",
+                        "error" : "token_expired"}), 401
+
+    @jwt.invalid_token_loader
+    def invalid_token_callback(error):
+        return jsonify({"message": "Signature verification failed",
+                        "error" : "invalid_token"}), 401
+    
+    @jwt.unauthorized_loader
+    def missing_token_callback(error):
+        return jsonify({"message": "Request does not contain a valid token",
+                        "error" : "authorization_required"}), 401
+        
+
     @app.get("/")
     def root():
         return (
@@ -39,5 +56,6 @@ def create_app():
 
 
 app = create_app()
+
 #expose app so 'flask --app backend.main run' works
-#'flask run' will be enabled thru .env file
+#'flask run' will be enabled thru .env fil

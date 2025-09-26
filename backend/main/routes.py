@@ -11,10 +11,8 @@ bp = Blueprint('api', __name__, url_prefix='/api')
 
 
 #USER REGISTRATION
-@bp.route('/register', methods = ['POST'])
+@bp.route('auth/register', methods = ['POST'])
 def register():
-    if current_user.is_authenticated:
-        return jsonify({"message": "Already logged in"}),200
     
     data = request.get_json()
     if not data:
@@ -26,6 +24,9 @@ def register():
     form = RegistrationForm.from_json(data = data)
 
     if form.validate_on_submit():
+        if User.query.filter_by(email = form.email.data).first():
+            return jsonify({"error":"Email is already registered"}), 409
+
         user = User(first_name = form.first_name.data, last_name = form.last_name.data, email = form.email.data)
         user.set_password(form.password.data)
         db.session.add(user)
@@ -35,12 +36,10 @@ def register():
         return jsonify({"error": form.errors}), 400
 
 
-#LOGIN USER AND POSSIBLE 'REMEMBER ME' FUNCTIONALITY
-@bp.route('/login', methods = ['POST'])
+#LOGIN USER USING JWT TOKENS
+@bp.route('auth/login', methods = ['POST'])
 def login():
-    if current_user.is_authenticated:
-        return jsonify({"message": "Already logged in"}),200
-    
+
     data = request.get_json()
     if not data:
         return jsonify({"error": "No data provided"}),400
@@ -56,7 +55,7 @@ def login():
         if user and user.check_password(password = form.password.data):
             access_token = create_access_token(identity=user.email)
             refresh_token = create_refresh_token(identity=user.email)
-            login_user(user)
+
             return jsonify({"message": "Login Successful",
                             "tokens": {
                                 "access": access_token,
@@ -70,10 +69,10 @@ def login():
         return jsonify({"error": form.errors}), 400
         
 
-#LOGOUT USER - Flask_login handles this
-@bp.route('/logout')
-def logout():
-    logout_user()
+#LOGOUT USER - Flask_login handles this (GOING TO BE REWORKED)
+@bp.route('/logout/<int:id>')
+def logout(id):
+    logout_user(id)
     return jsonify({"message": "Logged Out Successfully",}),200
 
 
