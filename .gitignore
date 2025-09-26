@@ -5,7 +5,7 @@ __pycache__/
 .env
 .idea/
 
-.dbnotes.txt
+notes\dbnotes.txt
 
 .vscode/
 *.code-workspace
