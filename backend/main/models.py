@@ -1,9 +1,8 @@
 from . import db
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import UserMixin
-from . import login
 
-class User(UserMixin, db.Model):
+
+class User(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     first_name = db.Column(db.String(30), nullable = False)
     last_name = db.Column(db.String(30))
@@ -54,11 +53,3 @@ class Labs(db.Model):
     lab_id = db.Column(db.Integer, primary_key = True)
     id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable = False)
     bloodpressure = db.Column(db.String(100))
-
-
-## USER LOADER - keeps track of logged in user
-# @login.user_loader
-# def load_user(id):
-#     return db.session.get(User, int(id)) #flask login passes in string, parse
-
-# ##

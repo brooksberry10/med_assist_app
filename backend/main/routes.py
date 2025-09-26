@@ -1,7 +1,6 @@
 from flask import Blueprint, request, jsonify
-from flask_login import current_user, login_user, logout_user
 from .models import User, DailySymptoms, FoodLog, Labs
-from .forms import RegistrationForm, LoginForm
+from .forms import RegistrationForm, LoginForm, ValidationError, UserSchema
 from flask_jwt_extended import create_access_token, create_refresh_token,jwt_required
 from . import db
 
@@ -11,70 +10,62 @@ bp = Blueprint('api', __name__, url_prefix='/api')
 
 
 #USER REGISTRATION
-@bp.route('auth/register', methods = ['POST'])
+@bp.route('/auth/register', methods = ['POST'])
 def register():
     
     data = request.get_json()
-    if not data:
-        return jsonify({"error": "No data provided"}),400
-    
-    if not data.get('email') or not data.get('password') or not data.get('first_name'):
-        return jsonify({"error": "First Name, Email, & Password are required"}), 400
+    print("User data:", data)
 
-    form = RegistrationForm.from_json(data = data)
+    schema = RegistrationForm()
 
-    if form.validate_on_submit():
-        if User.query.filter_by(email = form.email.data).first():
-            return jsonify({"error":"Email is already registered"}), 409
+    try:
+        validate = schema.load(data)
+    except ValidationError as error:
+        return jsonify({"errors": error.messages}), 400
 
-        user = User(first_name = form.first_name.data, last_name = form.last_name.data, email = form.email.data)
-        user.set_password(form.password.data)
-        db.session.add(user)
-        db.session.commit()
-        return jsonify({"message": "User created successfulyy"}), 201
-    else:
-        return jsonify({"error": form.errors}), 400
+    user = User(first_name = validate['first_name'], last_name = validate['last_name'], email = validate['email'])
+    user.set_password(validate['password'])
+    db.session.add(user)
+    db.session.commit()
+    return jsonify({"message": "User created successfulyy"}), 201
+
 
 
 #LOGIN USER USING JWT TOKENS
-@bp.route('auth/login', methods = ['POST'])
+@bp.route('/auth/login', methods = ['POST'])
 def login():
 
     data = request.get_json()
-    if not data:
-        return jsonify({"error": "No data provided"}),400
-
-    if not data.get('email') or not data.get('password'):
-        return jsonify({"error": "Email and password are required!"}), 400
     
-    form = LoginForm.from_json(data = data)
+    schema = LoginForm()
 
-    if form.validate_on_submit():
-        user = User.query.filter_by(email = form.email.data).first()
+    try:
+        validate = schema.load(data)
+    except ValidationError as error:
+        jsonify({"error": error.messages}), 400
 
-        if user and user.check_password(password = form.password.data):
-            access_token = create_access_token(identity=user.email)
-            refresh_token = create_refresh_token(identity=user.email)
+    user = User.query.filter_by(email = validate['email']).first()
 
-            return jsonify({"message": "Login Successful",
-                            "tokens": {
-                                "access": access_token,
-                                "refresh": refresh_token
-                                }
-                                
-                            }),200
-        
-        return jsonify({"error":"Invalid email or password"}),401
-    else:
-        return jsonify({"error": form.errors}), 400
+    if user and user.check_password(password = validate['password']):
+        access_token = create_access_token(identity=user.email)
+        refresh_token = create_refresh_token(identity=user.email)
+
+        return jsonify({"message": "Login Successful",
+                        "tokens": {
+                            "access": access_token,
+                            "refresh": refresh_token
+                            }
+                            
+                        }),200
+    
+    return jsonify({"error":"Invalid email or password"}),401
+    
         
 
 #LOGOUT USER - Flask_login handles this (GOING TO BE REWORKED)
 @bp.route('/logout/<int:id>')
 def logout(id):
-    logout_user(id)
-    return jsonify({"message": "Logged Out Successfully",}),200
-
+    pass
 
 
 # GET - A USER
@@ -101,20 +92,15 @@ def get_all_users():
     page = request.args.get('page', default=1, type=int)
     per_page =  request.args.get('per_page', default=20, type=int)
 
-    user_list = []
-    query = User.query.order_by(User.id)
-    users = db.paginate(query, page=page, per_page=per_page, error_out=False).items
+    users = User.query.paginate(
+        page=page,
+        per_page=per_page
+    )
 
-    for user in users:
-        user_list.append({
-            "id": user.id,
-            "first_name": user.first_name,
-            "last_name":user.last_name,
-            "email": user.email
-        })
+    result = UserSchema().dump(users, many=True)
 
     return jsonify({
-        "users": user_list
+        "users": result
     }), 200
 
 
