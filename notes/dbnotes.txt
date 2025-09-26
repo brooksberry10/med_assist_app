@@ -1,0 +1,18 @@
+- divided models for more flexibilty
+- changed schema such as var changes, length of strings, and added userInfo table.
+- created forms using flask-wtf to take json and validate user entries when authenticating
+- created login, logout, and register functionality
+- used wtforms_json to make each form that validates user input parse json data
+- added intiaitons for flask login handling and flask-wtf forms
+- created secret key using python's secrects library and put it in .env file
+- config file refernces secret key so it can be used when needed
+- new requirments.txt with all the current packages needed 
+
+
+
+TODO:
+- Dont forget to remove db.drop_all() , this is TEMPORARY. Was activated while testing api's and creating multiple users
+- When testing api for login and registering, set WTF_CSRF_ENABLED = False TEMPORARLY until csrf is figured out for users
+- 
+
+

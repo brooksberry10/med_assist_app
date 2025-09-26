@@ -3,21 +3,17 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from . import login
 
-
-## USER LOADER
-@login.user_loader
-def load_user(id):
-    return db.session.get(User, int(id)) #flask login passes in string, parse
-
-##
-class User(UserMixin ,db.Model):
-    user_id = db.Column(db.Integer, primary_key = True)
+class User(UserMixin, db.Model):
+    id = db.Column(db.Integer, primary_key = True)
     first_name = db.Column(db.String(30), nullable = False)
     last_name = db.Column(db.String(30))
-    email = db.Column(db.String(50), unique = True, nullable = False)
+    email = db.Column(db.String(150), unique = True, nullable = False)
     password_hash = db.Column(db.String(255), nullable= False)
+
+    #HASH PASSWORD
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
+
         
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
@@ -29,7 +25,7 @@ class User(UserMixin ,db.Model):
 
 class UserInfo(db.Model):
     user_info_id = db.Column(db.Integer, primary_key = True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'), nullable = False)
+    id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable = False)
     age = db.Column(db.Integer)
     gender = db.Column(db.String(10))
     weight_lbs = db.Column(db.Float)
@@ -39,7 +35,7 @@ class UserInfo(db.Model):
     
 class DailySymptoms(db.Model):
     symptoms_id = db.Column(db.Integer, primary_key = True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'), nullable = False)
+    id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable = False)
     severity = db.Column(db.Integer)
     type_of_symptom = db.Column(db.String(20))
     weight_lbs = db.Column(db.Float)
@@ -47,7 +43,7 @@ class DailySymptoms(db.Model):
 
 class FoodLog(db.Model):
     foodlog_id = db.Column(db.Integer, primary_key = True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'), nullable = False)
+    id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable = False)
     breakfast = db.Column(db.String(100))
     lunch = db.Column(db.String(100))
     dinner = db.Column(db.String(100))
@@ -56,6 +52,13 @@ class FoodLog(db.Model):
 
 class Labs(db.Model):
     lab_id = db.Column(db.Integer, primary_key = True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'), nullable = False)
+    id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable = False)
     bloodpressure = db.Column(db.String(100))
 
+
+## USER LOADER - keeps track of logged in user
+@login.user_loader
+def load_user(id):
+    return db.session.get(User, int(id)) #flask login passes in string, parse
+
+##

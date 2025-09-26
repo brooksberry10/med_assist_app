@@ -3,123 +3,296 @@ GET http://localhost:5001/
 
 ###
 
-### Get All Users (should be empty initially)
-GET http://localhost:5001/api/user
+@baseUrl = http://localhost:5001/
+
+### Get A USER (should be empty initially)
+GET http://localhost:5001/api/user/1
 
 ###
 
-### Add a New User
-POST http://localhost:5001/api/user
+### Register New User - Valid Data
+POST {{baseUrl}}/api/register
 Content-Type: application/json
 
 {
-  "first_name": "Daivion",
-  "last_name": "Brooks",
-  "email": "dlb22e@fsu.edu",
-  "password": "mypassword123",
-  "age": 21,
-  "gender": "Male",
-  "weight_lbs": 160,
-  "height_ft": 6,
-  "current_diagnoses": "Has aids",
-  "medical_history": "Took aid medicine 3 years ago"
+  "first_name": "John",
+  "last_name": "Doe",
+  "email": "john.doe@example.com",
+  "password": "SecurePassword123",
+  "confirm_password": "SecurePassword123"
 }
 
 ###
 
-### Add Another User
-POST http://localhost:5001/api/user
+### Register Another User - Valid Data
+POST {{baseUrl}}/api/register
 Content-Type: application/json
 
 {
-  "first_name": "Lebron",
-  "last_name": "James",
-  "email": "lebronjames@example.com", 
-  "password": "password456",
-  "age": 45,
-  "gender": "Male",
-  "height_ft": 7
+  "first_name": "Jane",
+  "last_name": "Smith",
+  "email": "jane.smith@test.com",
+  "password": "MyPassword456",
+  "confirm_password": "MyPassword456"
 }
 
 ###
 
-### Get All Users Again (should show the users we added)
-GET http://localhost:5001/api/user
+### Get All User Again (should show the users we added)
+GET http://localhost:5001/api/user/1
+
 
 ###
 
-### Test Error - Missing Password (should fail)
-POST http://localhost:5001/api/user
+### Register New User - Valid Data
+POST {{baseUrl}}/api/register
 Content-Type: application/json
 
 {
-  "first_name": "Michael",
-  "last_name": "Jordan",
-  "email": "michaeljordan@example.com"
+  "first_name": "John",
+  "last_name": "Doe",
+  "email": "john.doe@example.com",
+  "password": "SecurePassword123",
+  "confirm_password": "SecurePassword123"
 }
 
 ###
 
-### Test Error - Duplicate Email (should fail)
-POST http://localhost:5001/api/user
+### Register Another User - Valid Data
+POST {{baseUrl}}/api/register
 Content-Type: application/json
 
 {
-  "first_name": "Daivion",
-  "last_name": "Brooks",
-  "email": "dlb22e@fsu.edu",
-  "password": "mypassword123",
-  "age": 21,
-  "gender": "Male",
-  "height_ft": 6,
-  "medical_history": "Took aid medicine 3 years ago"
+  "first_name": "Jane",
+  "last_name": "Smith",
+  "email": "jane.smith@test.com",
+  "password": "MyPassword456",
+  "confirm_password": "MyPassword456"
 }
 
 ###
 
-### Add Symptom for User 1
-POST http://localhost:5001/api/user/1/symptoms
+### Register - Missing Required Fields
+POST {{baseUrl}}/api/register
 Content-Type: application/json
 
 {
-  "severity": 10,
-  "type_of_symptom": "blood",
-  "weight_lbs": 93.0,
-  "notes": "almost died again"
+  "first_name": "Test",
+  "email": "incomplete@test.com"
 }
 
 ###
 
-### Get Symptoms for User 1
-GET http://localhost:5001/api/user/1/symptoms
-
-###
-
-### Get All Users Again (should show the users we added with symptoms)
-GET http://localhost:5001/api/user
-###
-
-### Add Food Log for User 1
-POST http://localhost:5001/api/user/1/food-logs
+### Register - Password Mismatch
+POST {{baseUrl}}/api/register
 Content-Type: application/json
 
 {
-  "breakfast": "Oatmeal with berries",
-  "lunch": "Chicken salad",
-  "dinner": "Grilled salmon",
-  "total_calories": 1800,
-  "notes": "Felt good today"
+  "first_name": "Test",
+  "last_name": "User",
+  "email": "mismatch@test.com",
+  "password": "Password123",
+  "confirm_password": "DifferentPassword"
 }
 
 ###
 
-## Get Food_logs for User 1
-GET http://localhost:5001/api/user/1/food-logs
+### Register - Password Too Short
+POST {{baseUrl}}/api/register
+Content-Type: application/json
+
+{
+  "first_name": "Test",
+  "last_name": "User",
+  "email": "short@test.com",
+  "password": "short",
+  "confirm_password": "short"
+}
 
 ###
 
+### Register - Invalid Email Format
+POST {{baseUrl}}/api/register
+Content-Type: application/json
 
-### Get All Users Again (should show the users we added with symptoms and food logs)
-GET http://localhost:5001/api/user
+{
+  "first_name": "Test",
+  "last_name": "User",
+  "email": "invalid-email",
+  "password": "ValidPassword123",
+  "confirm_password": "ValidPassword123"
+}
+
+###
+
+### Register - Duplicate Email
+POST {{baseUrl}}/api/register
+Content-Type: application/json
+
+{
+  "first_name": "Another",
+  "last_name": "John",
+  "email": "john.doe@example.com",
+  "password": "AnotherPassword123",
+  "confirm_password": "AnotherPassword123"
+}
+
+###
+
+### Register - Empty Request Body or Missing field
+POST {{baseUrl}}/api/register
+Content-Type: application/json
+
+{
+  "first_name": "me",
+  "email": "oopsie@email.com"
+}
+
+###
+
+### Login - Valid Credentials
+POST {{baseUrl}}/api/login
+Content-Type: application/json
+
+{
+  "email": "john.doe@example.com",
+  "password": "SecurePassword123"
+}
+
+###
+
+### Login - Invalid Password
+POST {{baseUrl}}/api/login
+Content-Type: application/json
+
+{
+  "email": "john.doe@example.com",
+  "password": "WrongPassword"
+}
+
+###
+
+### Login - Non-existent Email
+POST {{baseUrl}}/api/login
+Content-Type: application/json
+
+{
+  "email": "nonexistent@test.com",
+  "password": "SomePassword123"
+}
+
+###
+
+### Login - Missing Email
+POST {{baseUrl}}/api/login
+Content-Type: application/json
+
+{
+  "password": "SecurePassword123"
+}
+
+###
+
+### Login - Missing Password
+POST {{baseUrl}}/api/login
+Content-Type: application/json
+
+{
+  "email": "john.doe@example.com"
+}
+
+###
+
+### Login - Empty Request Body
+POST {{baseUrl}}/api/login
+Content-Type: application/json
+
+###
+
+### Login - Already Logged In (Test after successful login)
+POST {{baseUrl}}/api/login
+Content-Type: application/json
+
+{
+  "email": "john.doe@example.com",
+  "password": "SecurePassword123"
+}
+
+###
+
+### Logout - Valid Session
+GET {{baseUrl}}/api/logout
+
+###
+
+### Logout - No Active Session
+GET {{baseUrl}}/api/logout
+
+###
+
+### Register While Already Logged In (Test after login)
+POST {{baseUrl}}/api/register
+Content-Type: application/json
+
+{
+  "first_name": "Test",
+  "last_name": "User",
+  "email": "test.loggedin@example.com",
+  "password": "TestPassword123",
+  "confirm_password": "TestPassword123"
+}
+
+###
+
+### Test Edge Cases - Very Long Input
+POST {{baseUrl}}/api/register
+Content-Type: application/json
+
+{
+  "first_name": "VeryLongFirstNameThatExceedsThirtyCharacters",
+  "last_name": "VeryLongLastNameThatAlsoExceedsThirtyCharacters",
+  "email": "verylongemailaddressthatmightexceedlimits@verylongdomainnamethatisverylong.com",
+  "password": "ValidPassword123",
+  "confirm_password": "ValidPassword123"
+}
+
+###
+
+### Test Special Characters in Names
+POST {{baseUrl}}/api/register
+Content-Type: application/json
+
+{
+  "first_name": "Mary-Jane",
+  "last_name": "O'Connor",
+  "email": "mary.jane@test.com",
+  "password": "TestPassword123",
+  "confirm_password": "TestPassword123"
+}
+
+###
+
+### Test Whitespace Handling
+POST {{baseUrl}}/api/register
+Content-Type: application/json
+
+{
+  "first_name": "  John  ",
+  "last_name": "  Doe  ",
+  "email": "  whitespace@test.com  ",
+  "password": "TestPassword123",
+  "confirm_password": "TestPassword123"
+}
+
+###
+
+### Test Case Sensitivity in Email
+POST {{baseUrl}}/api/login
+Content-Type: application/json
+
+{
+  "email": "JOHN.DOE@EXAMPLE.COM",
+  "password": "SecurePassword123"
+}
 
 ###

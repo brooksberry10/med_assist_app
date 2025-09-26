@@ -2,6 +2,7 @@ from flask import Flask
 from .config import Config
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
+import wtforms_json
 
 db = SQLAlchemy()
 login = LoginManager()
@@ -12,6 +13,8 @@ def create_app():
     app.json.sort_keys = False
     db.init_app(app)
     login.init_app(app)
+    wtforms_json.init()
+    
 
     from .routes import bp as api_bp
 

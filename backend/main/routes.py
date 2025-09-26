@@ -1,70 +1,92 @@
 from flask import Blueprint, request, jsonify
+from flask_login import current_user, login_user, logout_user
 from .models import User, DailySymptoms, FoodLog, Labs
+from .forms import RegistrationForm, LoginForm
 from . import db
 
 #api will be the base path for backend to prevent frontend collisions
 bp = Blueprint('api', __name__, url_prefix='/api')
 
-# GET - USERS
-@bp.route('/user', methods = ['GET'])
-def get_users():
-    users = User.query.all()
-    users_list = []
-    for user in users:
-        users_list.append({
-            'user_id': user.user_id,
-            'first_name': user.first_name,
-            'last_name': user.last_name,
-            'email': user.email
-            # 'age':user.age,
-            # 'gender': user.gender,
-            # 'weight_lbs': user.weight_lbs,
-            # 'height_ft': user.height_ft,
-            # 'current_diagnoses': user.current_diagnoses,
-            # 'medical_history': user.medical_history,
-        })
 
-    return jsonify(users_list)
-
-# POST - USERS
-@bp.route('/user', methods = ['POST'])
-def add_user():
+#LOGIN USER AND POSSIBLE 'REMEMBER ME' FUNCTIONALITY
+@bp.route('/login', methods = ['POST'])
+def login():
+    if current_user.is_authenticated:
+        return jsonify({"message": "Already logged in"}),200
+    
     data = request.get_json()
+    if not data:
+        return jsonify({"error": "No data provided"}),400
 
-    new_user = User(
-        first_name = data['first_name'],
-        last_name = data['last_name'],
-        email = data['email'],
-        password = data['password']
-        # age = data.get('age'),
-        # gender = data.get('gender'),
-        # weight_lbs = data.get('weight_lbs'),
-        # height_ft = data.get('height_ft'),
-        # current_diagnoses = data.get('current_diagnoses'),
-        # medical_history = data.get('medical_history')
-    )
-    db.session.add(new_user)
-    db.session.commit()
-    return jsonify({"message": "User created successfully"}), 201
+    if not data.get('email') or not data.get('password'):
+        return jsonify({"error": "Email and password are required!"}), 400
+    
+    form = LoginForm.from_json(data = data)
 
+    if form.validate_on_submit():
+        user = User.query.filter_by(email = form.email.data).first()
 
-#GET - USER INFORMATION
-@bp.route('/user/<int:user_it>/info', methods = ['GET'])
-def get_user_info(user_id):
-    pass
+        if user and user.check_password(password = form.password.data):
+            login_user(user)
+            return jsonify({"message": "Login Successful"}),200
+        
+        return jsonify({"error":"Invalid email or password"}),401
+    else:
+        return jsonify({"error": form.errors}), 400
         
 
+#LOGOUT USER - Flask_login handles this
+@bp.route('/logout')
+def logout():
+    logout_user()
+    return jsonify({"message": "Logged Out Successfully",})
 
-#POST - USER INFORMATION
-@bp.route('/user/<int:user_it>/info', methods = ['POST'])
-def add_user_info(user_id):
-    pass
+
+#USER REGISTRATION
+@bp.route('/register', methods = ['POST'])
+def register():
+    if current_user.is_authenticated:
+        return jsonify({"message": "Already logged in"}),200
     
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "No data provided"}),400
+    
+    if not data.get('email') or not data.get('password') or not data.get('first_name'):
+        return jsonify({"error": "First Name, Email, & Password are required"}), 400
+
+    form = RegistrationForm.from_json(data = data)
+
+    if form.validate_on_submit():
+        user = User(first_name = form.first_name.data, last_name = form.last_name.data, email = form.email.data)
+        user.set_password(form.password.data)
+        db.session.add(user)
+        db.session.commit()
+        return jsonify({"message": "User created successfulyy"}), 201
+    else:
+        return jsonify({"error": form.errors}), 400
+
+
+# GET - USER
+@bp.route('/user/<int:id>', methods = ['GET'])
+def get_user(id):
+    user = User.query.filter_by(id=id).first()
+
+    if user:
+        user_info = {
+                'id': user.id,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+                'email': user.email}
+
+        return jsonify(user_info)
+    else:
+        return jsonify({"error": "User does not exist"})
 
 # GET - SYMPTOMS
-@bp.route('/user/<int:user_id>/symptoms', methods = ['GET'])
-def get_symptoms(user_id):
-    user = User.query.get(user_id)
+@bp.route('/user/<int:id>/symptoms', methods = ['GET'])
+def get_symptoms(id):
+    user = User.query.get(id)
     if not user:
         return jsonify({"error": "User not found"}), 404
 
@@ -80,16 +102,16 @@ def get_symptoms(user_id):
     return jsonify(symptoms_list)
 
 # POST - SYMPTOMS
-@bp.route('/user/<int:user_id>/symptoms', methods = ['POST'])
-def add_symptoms(user_id):
+@bp.route('/user/<int:id>/symptoms', methods = ['POST'])
+def add_symptoms(id):
     try:
-        user = User.query.get(user_id)
+        user = User.query.get(id)
         if not user:
             return jsonify({"error":"User not found"}), 404
         
         data = request.get_json()
         symptom = DailySymptoms(
-            user_id = user_id,
+            id = id,
             severity = data.get('severity'),
             type_of_symptom = data.get('type_of_symptom'),
             weight_lbs = data.get('weight_lbs'),
@@ -103,9 +125,9 @@ def add_symptoms(user_id):
         return jsonify({"error": "Failed to log symptom"}), 500
 
 # GET - FOOD LOGS
-@bp.route('/user/<int:user_id>/food-logs', methods = ['GET'])
-def get_foodlogs(user_id):
-    user = User.query.get(user_id)
+@bp.route('/user/<int:id>/food-logs', methods = ['GET'])
+def get_foodlogs(id):
+    user = User.query.get(id)
 
     if not user:
         return jsonify({"error": "User does not exist"}),404
@@ -124,17 +146,17 @@ def get_foodlogs(user_id):
     return jsonify(foodlog_list)
     
 # POST - FOOD LOGS
-@bp.route('/user/<int:user_id>/food-logs', methods = ['POST'])
-def add_foodlog(user_id):
+@bp.route('/user/<int:id>/food-logs', methods = ['POST'])
+def add_foodlog(id):
     try:
-        user = User.query.get(user_id)
+        user = User.query.get(id)
 
         if not user:
             return jsonify({'error': 'User does not exist'})
         
         data = request.get_json()
         foodlog = FoodLog(
-            user_id = user_id,
+            id = id,
             breakfast = data.get('breakfast'),
             lunch = data.get('lunch'),
             dinner = data.get('dinner'),
