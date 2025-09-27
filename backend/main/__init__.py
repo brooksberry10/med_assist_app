@@ -1,5 +1,6 @@
 from flask import Flask, jsonify    
 from .config import Config
+
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
 
@@ -13,30 +14,55 @@ def create_app():
     db.init_app(app)
     jwt.init_app(app)
     
-
+    from .models import User, TokenBlockList
     from .routes import bp as api_bp
 
     app.register_blueprint(api_bp)
 
     with app.app_context():
-        db.drop_all() #temporary
+        # db.drop_all() #temporary
         db.create_all()
 
+    #LOAD CURRENT USER WITH SPECIFIC JWT
+    @jwt.user_lookup_loader
+    def user_lookup_callback(jwt_header, jwt_data):
 
+        identity = jwt_data['sub']
+
+        return User.query.filter_by(email = identity).one_or_none()
+
+    #ALLOW CHANGE TO CLAIMS - uses sub. Can give admin privledges and be used for access control
+    @jwt.additional_claims_loader
+    def make_additional_claims(identity):
+        if identity == "daivionbrooks11@gmail.com":
+            return({"is_admin": True})
+        return ({"is_admin": False})
+
+    #JWT ERROR HANDLERS
     @jwt.expired_token_loader
     def expired_token_callback(jwt_header, jwt_data):
-        return jsonify({"message": "Token has expired",
-                        "error" : "token_expired"}), 401
+        return jsonify({"error" : "token_expired",
+                        "message": "Token has expired"}), 401
 
     @jwt.invalid_token_loader
     def invalid_token_callback(error):
-        return jsonify({"message": "Signature verification failed",
-                        "error" : "invalid_token"}), 401
+        return jsonify({"error" : "invalid_token",
+                        "message": "Signature verification failed"}), 401
     
     @jwt.unauthorized_loader
     def missing_token_callback(error):
-        return jsonify({"message": "Request does not contain a valid token",
-                        "error" : "authorization_required"}), 401
+        return jsonify({"error" : "authorization_required",
+                        "message": "Request does not contain a valid token"}), 401
+        
+    #CHECKS IF JWT IS REVOKED (assist with logging out)
+    @jwt.token_in_blocklist_loader
+    def token_in_blocklist_callback(jwt_header, jwt_data):
+        jti = jwt_data['jti']
+
+        token = db.session.query(TokenBlockList).filter(TokenBlockList.jti == jti).scalar()
+
+        return token is not None #WILL THROW AN ERROR AND TELL US IF TOKEN IN DB WAS REVOKED
+
         
 
     @app.get("/")

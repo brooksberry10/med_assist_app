@@ -1,7 +1,9 @@
 from flask import Blueprint, request, jsonify
 from .models import User, DailySymptoms, FoodLog, Labs
 from .forms import RegistrationForm, LoginForm, ValidationError, UserSchema
-from flask_jwt_extended import create_access_token, create_refresh_token,jwt_required
+from flask_jwt_extended import (create_access_token, create_refresh_token,
+                                jwt_required, get_jwt, current_user,
+                                get_jwt_identity)
 from . import db
 
 #api will be the base path for backend to prevent frontend collisions
@@ -15,7 +17,6 @@ bp = Blueprint('api', __name__, url_prefix='/api')
 def register():
     
     data = request.get_json()
-    print("User data:", data)
 
     schema = RegistrationForm()
 
@@ -65,9 +66,26 @@ def login():
 
 #LOGOUT USER -(GOING TO BE REWORKED) 
 @bp.route('/logout/<int:id>')
-def logout(id):
+def logout():
     pass
 
+#GETS JWT CLAIMS OF A USER WITH SPECIFICED JWT
+@bp.route('/whoami', methods = ['GET'])
+@jwt_required()
+def whoami():
+    return jsonify({"message": "message", "user_details": {"first_name": current_user.first_name,
+                                                           "last_name": current_user.last_name,
+                                                           "email": current_user.email}})
+
+#CAN BE USED TO REGAIN ACCESS WITH REFRESH TOKEN
+@bp.route('/refresh', methods = ['GET'])
+@jwt_required(refresh=True) #only allows users to access this endpoint if refresh token is provided
+def refresh_access():
+    identity = get_jwt_identity()
+
+    new_access_token = create_access_token(identity=identity) 
+
+    return jsonify({"access_token":new_access_token})
 
 #-------------------------------------USER & USER INFO----------------------------------------#
 # GET - A USER
@@ -91,20 +109,22 @@ def get_user(id):
 @jwt_required()
 def get_all_users():
     
-    page = request.args.get('page', default=1, type=int)
-    per_page =  request.args.get('per_page', default=20, type=int)
+    claims = get_jwt()
+    if claims.get('is_admin'):
+        page = request.args.get('page', default=1, type=int)
+        per_page =  request.args.get('per_page', default=20, type=int)
 
-    users = User.query.paginate(
-        page=page,
-        per_page=per_page
-    )
+        users = User.query.paginate(
+            page=page,
+            per_page=per_page
+        )
 
-    result = UserSchema().dump(users, many=True)
+        result = UserSchema().dump(users, many=True)
 
-    return jsonify({
-        "users": result
-    }), 200
-
+        return jsonify({
+            "users": result
+        }), 200
+    return jsonify({"message":"You are not authorized to access this"}), 401
 
 
 #-------------------------------------USER HEALTH RECORD---------------------------------------#
