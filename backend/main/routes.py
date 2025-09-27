@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from .models import User, DailySymptoms, FoodLog, Labs
+from .models import User, DailySymptoms, FoodLog, Labs, TokenBlockList
 from .forms import RegistrationForm, LoginForm, ValidationError, UserSchema
 from flask_jwt_extended import (create_access_token, create_refresh_token,
                                 jwt_required, get_jwt, current_user,
@@ -64,10 +64,21 @@ def login():
     
         
 
-#LOGOUT USER -(GOING TO BE REWORKED) 
-@bp.route('/logout/<int:id>')
+#LOGOUT USER - VIA REVOKING ACCESS TOKENS AND REFRESH TOKEN
+@bp.route('/logout', methods = ['GET'])
+@jwt_required(verify_type=False) #allows both access and refresh tokens
 def logout():
-    pass
+    jwt = get_jwt()
+
+    jti = jwt['jti']
+    token_type = jwt['type']
+
+
+    token_block = TokenBlockList(jti = jti)
+    token_block.save()
+
+    return jsonify({"message":f"{token_type} token revoked successfully"}),200
+
 
 #GETS JWT CLAIMS OF A USER WITH SPECIFICED JWT
 @bp.route('/whoami', methods = ['GET'])
@@ -90,6 +101,7 @@ def refresh_access():
 #-------------------------------------USER & USER INFO----------------------------------------#
 # GET - A USER
 @bp.route('/user/<int:id>', methods = ['GET'])
+@jwt_required()
 def get_user(id):
     user = User.query.filter_by(id=id).first()
 
@@ -130,7 +142,14 @@ def get_all_users():
 #-------------------------------------USER HEALTH RECORD---------------------------------------#
 # GET - SYMPTOMS
 @bp.route('/user/<int:id>/symptoms', methods = ['GET'])
+@jwt_required()
 def get_symptoms(id):
+
+    current_user_id = get_jwt_identity()
+
+    if current_user_id != id:
+        return jsonify({"message":"Access Denied"}),403
+    
     user = User.query.get(id)
     if not user:
         return jsonify({"error": "User not found"}), 404
@@ -148,6 +167,7 @@ def get_symptoms(id):
 
 # POST - SYMPTOMS
 @bp.route('/user/<int:id>/symptoms', methods = ['POST'])
+@jwt_required()
 def add_symptoms(id):
     try:
         user = User.query.get(id)
@@ -171,6 +191,7 @@ def add_symptoms(id):
 
 # GET - FOOD LOGS
 @bp.route('/user/<int:id>/food-logs', methods = ['GET'])
+@jwt_required()
 def get_foodlogs(id):
     user = User.query.get(id)
 
@@ -192,6 +213,7 @@ def get_foodlogs(id):
     
 # POST - FOOD LOGS
 @bp.route('/user/<int:id>/food-logs', methods = ['POST'])
+@jwt_required()
 def add_foodlog(id):
     try:
         user = User.query.get(id)

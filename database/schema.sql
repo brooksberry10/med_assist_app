@@ -56,7 +56,7 @@ CREATE TABLE labs (
 
 CREATE TABLE token_blocklist(
     id INT AUTO_INCREMENT PRIMARY KEY,
-    jti VARCHAR() NOT NULL,
+    jti VARCHAR(64) NOT NULL,
     create_at DATETIME
 
 );

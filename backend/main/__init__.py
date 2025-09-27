@@ -20,9 +20,9 @@ def create_app():
     app.register_blueprint(api_bp)
 
     with app.app_context():
-        # db.drop_all() #temporary
         db.create_all()
 
+    #---------------------------------------------------------------------------------------------#
     #LOAD CURRENT USER WITH SPECIFIC JWT
     @jwt.user_lookup_loader
     def user_lookup_callback(jwt_header, jwt_data):
@@ -63,7 +63,7 @@ def create_app():
 
         return token is not None #WILL THROW AN ERROR AND TELL US IF TOKEN IN DB WAS REVOKED
 
-        
+    #---------------------------------------------------------------------------------------------#
 
     @app.get("/")
     def root():

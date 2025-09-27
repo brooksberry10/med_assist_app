@@ -57,9 +57,13 @@ class Labs(db.Model):
 
 class TokenBlockList(db.Model):
     id = db.Column(db.Integer(), primary_key = True)
-    jti = db.Column(db.String(), nullabe = False)
+    jti = db.Column(db.String(64), nullable = False)
     create_at = db.Column(db.DateTime(), default = datetime.now(timezone.utc))
 
     def __repr__(self):
         return f"<Token {self.jti}>"
+    
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
         
