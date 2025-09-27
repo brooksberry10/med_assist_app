@@ -14,7 +14,7 @@ def create_app():
     db.init_app(app)
     jwt.init_app(app)
     
-    from .models import User, TokenBlockList
+    from .models import Users, TokenBlockList
     from .routes import bp as api_bp
 
     app.register_blueprint(api_bp)
@@ -22,14 +22,15 @@ def create_app():
     with app.app_context():
         db.create_all()
 
+
     #---------------------------------------------------------------------------------------------#
-    #LOAD CURRENT USER WITH SPECIFIC JWT
+    #LOAD CURRENT Users WITH SPECIFIC JWT
     @jwt.user_lookup_loader
     def user_lookup_callback(jwt_header, jwt_data):
 
         identity = jwt_data['sub']
 
-        return User.query.filter_by(email = identity).one_or_none()
+        return Users.query.filter_by(email = identity).one_or_none()
 
     #ALLOW CHANGE TO CLAIMS - uses sub. Can give admin privledges and be used for access control
     @jwt.additional_claims_loader

@@ -1,64 +1,69 @@
-DROP DATABASE IF EXISTS med_assist;
 
-CREATE DATABASE med_assist;
-USE med_assist;
-
-CREATE TABLE user (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE users (
+    id BIGSERIAL PRIMARY KEY,
     first_name VARCHAR(30) NOT NULL,
     last_name VARCHAR(30),
-    email VARCHAR(150) UNIQUE NOT NULL,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    email VARCHAR(254) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL
-    );
+);
 
 CREATE TABLE user_info(
-    user_info_id INT AUTO_INCREMENT PRIMARY KEY,
-    id INT NOT NULL,
+    user_info_id BIGSERIAL PRIMARY KEY,
+    id BIGINT NOT NULL,
     age INT,
     gender VARCHAR(10),
     weight_lbs FLOAT,
-    height_ft FLOAT,
-    current_diagnoses VARCHAR(1000),
-    medical_history VARCHAR(1000),
-    FOREIGN KEY (id) REFERENCES user(id) ON DELETE CASCADE
+    height_ft INT,
+    height_inch INT,
+    current_diagnoses TEXT,
+    medical_history TEXT,
+	insurance TEXT,
+    FOREIGN KEY (id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE daily_symptoms (
-    symptoms_id INT AUTO_INCREMENT PRIMARY KEY,
-    id INT NOT NULL,
-    severity INT,
-    type_of_symptom VARCHAR(20),
+    symptoms_id BIGSERIAL PRIMARY KEY,
+    id BIGINT NOT NULL,
+    severity INT CHECK (severity BETWEEN 0 AND 10),
+    type_of_symptom VARCHAR(100),
     weight_lbs FLOAT,
-    notes VARCHAR(1000),
-    FOREIGN KEY (id) REFERENCES user(id) ON DELETE CASCADE
+    notes TEXT,
+	recorded_on DATE DEFAULT CURRENT_DATE,
+    FOREIGN KEY (id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE treatments (
+    treatment_id BIGSERIAL PRIMARY KEY,
+    id BIGINT NOT NULL,
+    treatment_name VARCHAR(100),
+    scheduled_on DATE NOT NULL,
+    notes TEXT,
+    is_completed BOOLEAN DEFAULT false,
+    FOREIGN KEY (id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 --log daily food intake to track symptom reactions related to food
 CREATE TABLE food_log (
-    foodlog_id INT AUTO_INCREMENT PRIMARY KEY,
-    id INT NOT NULL,
+    foodlog_id BIGSERIAL PRIMARY KEY,
+    id BIGINT NOT NULL,
     breakfast VARCHAR(100),
     lunch VARCHAR(100),
     dinner VARCHAR(100),
-    notes VARCHAR(1000),
-    total calories FLOAT,
-    FOREIGN KEY (id) REFERENCES user(id) ON DELETE CASCADE
+    notes TEXT,
+    total_calories FLOAT,
+	recorded_on DATE DEFAULT CURRENT_DATE,
+    FOREIGN KEY (id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE labs (
-    lab_id INT AUTO_INCREMENT PRIMARY KEY,
-    id INT NOT NULL,
-    bloodpressure VARCHAR(100)
-    FOREIGN KEY (id) REFERENCES user(id) ON DELETE CASCADE
+    lab_id BIGSERIAL PRIMARY KEY,
+    id BIGINT NOT NULL,
+    -- Both systolic and diastolic are needed to calculate blood pressure --
+    systolic_pressure INT,
+    diastolic_pressure INT
+	rbc_count FLOAT,
+    FOREIGN KEY (id) REFERENCES users(id) ON DELETE CASCADE
     --not finished
 
 );
-
-CREATE TABLE token_blocklist(
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    jti VARCHAR(64) NOT NULL,
-    create_at DATETIME
-
-);
-
-CREATE TABLE ()
