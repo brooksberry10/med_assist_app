@@ -8,6 +8,7 @@ from . import db
 bp = Blueprint('api', __name__, url_prefix='/api')
 
 
+#------------------------------------------AUTHENTICATION----------------------------------------------------#
 
 #USER REGISTRATION #*DONE
 @bp.route('/auth/register', methods = ['POST'])
@@ -62,12 +63,13 @@ def login():
     
         
 
-#LOGOUT USER - Flask_login handles this (GOING TO BE REWORKED) #*DONE
+#LOGOUT USER -(GOING TO BE REWORKED) 
 @bp.route('/logout/<int:id>')
 def logout(id):
     pass
 
 
+#-------------------------------------USER & USER INFO----------------------------------------#
 # GET - A USER
 @bp.route('/user/<int:id>', methods = ['GET'])
 def get_user(id):
@@ -104,6 +106,8 @@ def get_all_users():
     }), 200
 
 
+
+#-------------------------------------USER HEALTH RECORD---------------------------------------#
 # GET - SYMPTOMS
 @bp.route('/user/<int:id>/symptoms', methods = ['GET'])
 def get_symptoms(id):
