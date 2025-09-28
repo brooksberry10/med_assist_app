@@ -20,6 +20,7 @@ max_email_length = 150
 min_password_length = 8
 max_password_length = 64
 
+
 #Form for registration
 class RegistrationForm(Schema):
 
@@ -28,10 +29,10 @@ class RegistrationForm(Schema):
 
     username = fields.String(data_key='username', required=True, validate=[validate.Length(min=min_username_length, max=max_username_length, error= f"Username must be between {min_username_length} and {max_username_length} characters")])
 
-    email = fields.Email(data_key='email',required=True,validate=[validate.Length(min=min_email_length,max=max_email_length),validate.Email(error="Invalid email")])
+    email = fields.Email(data_key='email',required=True,validate=[validate.Length(min=min_email_length,max=max_email_length, error= f'Email must be between {min_email_length} and {max_email_length} characters')])
 
-    password = fields.String(required=True, validate=[validate.Length(min=min_password_length,max=max_password_length, error = f"Password must be between {min_password_length} and {max_password_length} characters")])
-    confirm_password = fields.String(required=True, validate=[validate.Length(min=min_password_length,max=max_password_length, error = f"Password must be between {min_password_length} and {max_password_length} characters")])
+    password = fields.String(required=True, validate=[validate.Length(min=min_password_length,max=max_password_length, error = f"Password must be between {min_password_length} and {max_password_length} characters")], load_only=True)
+    confirm_password = fields.String(required=True, validate=[validate.Length(min=min_password_length,max=max_password_length, error = f"Password must be between {min_password_length} and {max_password_length} characters")], load_only=True)
 
     @validates('email')
     def validate_email(self, data, **kwargs):
@@ -52,10 +53,16 @@ class RegistrationForm(Schema):
         if data['password'] != data['confirm_password']:
             raise ValidationError("Passwords do not match", field_name= 'confirm_password')
         
+
 #login form 
-class LoginForm(Schema):
-    email = fields.Email(data_key='email',required=True,validate=[validate.Length(min = min_email_length,max=max_email_length),validate.Email(error="Invalid email")])
-    password = fields.String(required=True, validate=[validate.Length(min=min_password_length, max=max_password_length, error = f"Password must be between {min_password_length} and {max_password_length} characters")])
+class LoginFormEmail(Schema):
+    email = fields.Email(data_key='email',required=True,validate=[validate.Length(min = min_email_length,max=max_email_length,error= f'Email must be between {min_email_length} and {max_email_length} characters')])
+    password = fields.String(required=True, validate=[validate.Length(min=min_password_length, max=max_password_length, error = f"Password must be between {min_password_length} and {max_password_length} characters")], load_only=True)
+
+
+class LoginFormUsername(Schema):
+    username = fields.String(data_key='username', required=True, validate=[validate.Length(min=min_username_length, max=max_username_length, error= f"Username must be between {min_username_length} and {max_username_length} characters")])
+    password = fields.String(required=True, validate=[validate.Length(min=min_password_length, max=max_password_length, error = f"Password must be between {min_password_length} and {max_password_length} characters")], load_only=True)
 
 
 #form template to get a user
@@ -67,7 +74,7 @@ class UserSchema(Schema):
 
     username = fields.String(data_key='username', required=True, validate=[validate.Length(min=min_username_length, max=max_username_length, error= f"Username must be between {min_username_length} and {max_username_length} characters")])
 
-    email = fields.Email(data_key='email',required=True,validate=[validate.Length(min=min_email_length,max=max_email_length),validate.Email(error="Invalid email")])
+    email = fields.Email(data_key='email',required=True,validate=[validate.Length(min=min_email_length,max=max_email_length,error= f'Email must be between {min_email_length} and {max_email_length} characters')])
 
 
 class UserInfoForm(Schema):
@@ -96,11 +103,12 @@ class UserInfoForm(Schema):
     weight_lbs = fields.Float(data_key='weight_lbs',validate=validate.Range(min=0.0,max=max_weight_range, error=f'Weight must be between 0.0lb and {max_weight_range}lb'))
 
     height_ft = fields.Integer(data_key='height_ft', validate=validate.Range(min=0, max=max_height_feet_range, error=f'Height must be between 0ft and {max_height_feet_range}ft'))
-    height_inch = fields.Integer(data_key='height_inch', validate=validate.Range(min = 0, max=max_height_inch_range, error=f'Height must be between 0in and {max_height_inch_range}in'))
+    height_in = fields.Integer(data_key='height_in', validate=validate.Range(min = 0, max=max_height_inch_range, error=f'Height must be between 0in and {max_height_inch_range}in'))
 
     current_diagnoses = fields.String(data_key='current_diagnoses')
     medical_history = fields.String(data_key='medical_history')
     insurance = fields.String(data_key='insurance')
+
 
 class DailySymptomsForm(Schema):
 
@@ -122,7 +130,10 @@ class DailySymptomsForm(Schema):
 
     weight_lbs = fields.Float(data_key='weight_lbs',validate=validate.Range(min=0.0,max=max_weight_range, error=f'Weight must be between 0.0lb and {max_weight_range}lb'))
 
+    recorded_on = fields.DateTime(data_key='recorded_on', format='%b %d, %Y')
+
     notes = fields.String(data_key='notes')
+
 
 class TreatmentsForm(Schema):
 
@@ -132,7 +143,7 @@ class TreatmentsForm(Schema):
     treatment_id = fields.Integer(data_key='treatment_id')
     treatment_name = fields.String(data_key='treatment_name', validate=validate.Length(max = max_length_treatment))
 
-    scheduled_on = fields.DateTime(data_key='scheduled_on')
+    scheduled_on = fields.DateTime(data_key='scheduled_on',format='%b %d, %Y')
 
     notes = fields.String(data_key='notes')
 
@@ -142,6 +153,8 @@ class FoodLogForm(Schema):
     foodlog_id = fields.Integer(data_key='lab_id')
     notes = fields.String(data_key='notes')
     total_calories = fields.Float(data_key='total_calories', validate=validate.Range(min = 0))
+    recorded_on = fields.DateTime(data_key='recorded_on', format='%b %d, %Y')
+
 
 class LabsForm(Schema):
     max_systolic_range = 500
@@ -153,3 +166,6 @@ class LabsForm(Schema):
     diastolic_pressure = fields.Integer(data_key='diastolic_pressure', validate=validate.Range(min = 0, max=max_diastolic_range, error=f'Diastolic pressure must be between 0 and {max_diastolic_range}'))
 
     rbc_count = fields.Float(data_key='rbc_count')
+
+
+

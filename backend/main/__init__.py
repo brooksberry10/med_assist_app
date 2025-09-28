@@ -1,43 +1,39 @@
-from flask import Flask, jsonify    
+from flask import Flask, jsonify
 from .config import Config
-
+from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
 
+
 db = SQLAlchemy()
 jwt = JWTManager()
+migrate = Migrate()
 
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
     app.json.sort_keys = False
+    
     db.init_app(app)
     jwt.init_app(app)
+    migrate.init_app(app, db)
     
     from .models import Users, TokenBlockList
     from .routes import bp as api_bp
 
     app.register_blueprint(api_bp)
 
+
     with app.app_context():
         db.create_all()
 
-
-    #---------------------------------------------------------------------------------------------#
+    #-----------------------------------------jWT HANDLERS----------------------------------------#
     #LOAD CURRENT Users WITH SPECIFIC JWT
     @jwt.user_lookup_loader
     def user_lookup_callback(jwt_header, jwt_data):
-
         identity = jwt_data['sub']
-
-        return Users.query.filter_by(email = identity).one_or_none()
-
-    #ALLOW CHANGE TO CLAIMS - uses sub. Can give admin privledges and be used for access control
-    @jwt.additional_claims_loader
-    def make_additional_claims(identity):
-        if identity == "daivionbrooks11@gmail.com":
-            return({"is_admin": True})
-        return ({"is_admin": False})
+        return Users.query.filter_by(id = int(identity)).one_or_none()
+    
 
     #JWT ERROR HANDLERS
     @jwt.expired_token_loader
@@ -59,9 +55,7 @@ def create_app():
     @jwt.token_in_blocklist_loader
     def token_in_blocklist_callback(jwt_header, jwt_data):
         jti = jwt_data['jti']
-
         token = db.session.query(TokenBlockList).filter(TokenBlockList.jti == jti).scalar()
-
         return token is not None #WILL THROW AN ERROR AND TELL US IF TOKEN IN DB WAS REVOKED
 
     #---------------------------------------------------------------------------------------------#
