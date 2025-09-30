@@ -54,15 +54,6 @@ CREATE TABLE food_log (
     total_calories FLOAT,
 	recorded_on DATE DEFAULT CURRENT_DATE,
     FOREIGN KEY (id) REFERENCES users(id) ON DELETE CASCADE
-    foodlog_id BIGSERIAL PRIMARY KEY,
-    id BIGINT NOT NULL,
-    breakfast VARCHAR(100),
-    lunch VARCHAR(100),
-    dinner VARCHAR(100),
-    notes TEXT,
-    total_calories FLOAT,
-	recorded_on DATE DEFAULT CURRENT_DATE,
-    FOREIGN KEY (id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE labs (
