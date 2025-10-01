@@ -18,10 +18,16 @@ def create_app():
     jwt.init_app(app)
     migrate.init_app(app, db)
     
+    # Import models
     from .models import Users, TokenBlockList
-    from .routes import bp as api_bp
-
-    app.register_blueprint(api_bp)
+    
+    # Import and register blueprints
+    from .routes import auth_bp, users_bp, symptoms_bp, food_logs_bp
+    
+    app.register_blueprint(auth_bp)
+    app.register_blueprint(users_bp)
+    app.register_blueprint(symptoms_bp)
+    app.register_blueprint(food_logs_bp)
 
 
     with app.app_context():
