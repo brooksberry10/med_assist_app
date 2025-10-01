@@ -10,7 +10,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@heroui/react": "^2.8.4",
+    "@heroui/theme": "^2.4.22",
     "@tailwindcss/postcss": "^4.1.13",
+    "framer-motion": "^12.23.22",
     "react": "^19.1.1",
     "react-dom": "^19.1.1"
   },
