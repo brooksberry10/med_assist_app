@@ -49,7 +49,7 @@ We use Flask-Migrate to handle schema changes.
 After starting the Postgres container, always run:
 ```bash
 flask db upgrade
-
+```
 
 
 ## Set up Flask
