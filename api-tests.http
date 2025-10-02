@@ -1,0 +1,320 @@
+### Test Flask Backend is Running
+GET http://localhost:5001/
+
+###
+
+@baseUrl = http://localhost:5001/
+
+### Get A USER (should be empty initially)
+GET http://localhost:5001/api/user/1
+
+###
+
+### Register New User - Valid Data
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "first_name": "John",
+  "last_name": "Doe",
+  "email": "john.doe@example.com",
+  "password": "SecurePassword123",
+  "confirm_password": "SecurePassword123"
+}
+
+###
+
+### Register Another User - Valid Data
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "first_name": "Jane",
+  "last_name": "Smith",
+  "email": "jane.smith@test.com",
+  "password": "MyPassword456",
+  "confirm_password": "MyPassword456"
+}
+
+###
+
+### Get All User Again (should show the users we added)
+GET http://localhost:5001/api/user/1
+
+
+###
+
+### Register New User - Valid Data
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "first_name": "John",
+  "last_name": "Doe",
+  "email": "john.doe@example.com",
+  "password": "SecurePassword123",
+  "confirm_password": "SecurePassword123"
+}
+
+###
+
+### Register Another User - Valid Data
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "first_name": "Jane",
+  "last_name": "Smith",
+  "email": "jane.smith@test.com",
+  "password": "MyPassword456",
+  "confirm_password": "MyPassword456"
+}
+
+###
+
+### Register - Missing Required Fields
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "first_name": "Test",
+  "email": "incomplete@test.com"
+}
+
+###
+
+### Register - Password Mismatch
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "first_name": "Test",
+  "last_name": "User",
+  "email": "mismatch@test.com",
+  "password": "Password123",
+  "confirm_password": "DifferentPassword"
+}
+
+###
+
+### Register - Password Too Short
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "first_name": "Test",
+  "last_name": "User",
+  "email": "short@test.com",
+  "password": "short",
+  "confirm_password": "short"
+}
+
+###
+
+### Register - Invalid Email Format
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "first_name": "Test",
+  "last_name": "User",
+  "email": "invalid-email",
+  "password": "ValidPassword123",
+  "confirm_password": "ValidPassword123"
+}
+
+###
+
+### Register - Duplicate Email
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "first_name": "Another",
+  "last_name": "John",
+  "email": "john.doe@example.com",
+  "password": "AnotherPassword123",
+  "confirm_password": "AnotherPassword123"
+}
+
+###
+
+### Register - Empty Request Body or Missing field
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "first_name": "me",
+  "email": "oopsie@email.com"
+}
+
+###
+
+### Login - Valid Credentials
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "john.doe@example.com",
+  "password": "SecurePassword123"
+}
+
+###
+
+### Login - Invalid Password
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "john.doe@example.com",
+  "password": "WrongPassword"
+}
+
+###
+
+### Login - Non-existent Email
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "nonexistent@test.com",
+  "password": "SomePassword123"
+}
+
+###
+
+### Login - Missing Email
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "password": "SecurePassword123"
+}
+
+###
+
+### Login - Missing Password
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "john.doe@example.com"
+}
+
+###
+
+### Login - Empty Request Body
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+###
+
+### Login - Already Logged In (Test after successful login)
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "john.doe@example.com",
+  "password": "SecurePassword123"
+}
+
+###
+
+### Logout - Valid Session
+GET {{baseUrl}}/api/logout
+
+###
+
+### Logout - No Active Session
+GET {{baseUrl}}/api/logout
+
+###
+
+### Register While Already Logged In (Test after login)
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "first_name": "Test22",
+  "last_name": "User44",
+  "email": "zddaad-in@exdwalddwdwed.com",
+  "password": "TestPassword123",
+  "confirm_password": "TestPassword123"
+}
+
+###
+
+### Test Edge Cases - Very Long Input
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "first_name": "VeryLongFirstNameThatExceedsThirtyCharacters",
+  "last_name": "VeryLongLastNameThatAlsoExceedsThirtyCharacters",
+  "email": "verylongemailaddressthatmightexceedlimits@verylongdomainnamethatisverylong.com",
+  "password": "ValidPassword123",
+  "confirm_password": "ValidPassword123"
+}
+
+###
+
+### Test Special Characters in Names
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "first_name": "Mary-Jane",
+  "last_name": "O'Conor",
+  "email": "marjaad1ae@test.com",
+  "password": "TestPassword123",
+  "confirm_password": "TestPassword123"
+}
+
+### LOGIN MARY-JANE
+
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "marjaad1ae@test.com",
+  "password": "TestPassword123"
+}
+
+
+### Test Whitespace Handling
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "first_name": "  John  ",
+  "last_name": "  Doe  ",
+  "email": "  whitespace@test.com  ",
+  "password": "TestPassword123",
+  "confirm_password": "TestPassword123"
+}
+
+###
+
+### Test Case Sensitivity in Email
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "JOHN.DOE@EXAMPLE.COM",
+  "password": "SecurePassword123"
+}
+
+###
+
+### TEST PAGINATION OF ALL USERS
+
+GET {{baseUrl}}/api/users/all?page=2
+Content-Type: application/json
+
+### REGISTER AND LOGIN MARY_JANE THEN TEST SITE AUTHORIZATION WITH TOKEN
+GET {{baseUrl}}/api/users/all?page=1
+Content-Type: application/json
+Authorization: Bearer PASTE ACCESS TOKEN HERE
+
+####
+
