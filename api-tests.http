@@ -318,3 +318,60 @@ Authorization: Bearer PASTE ACCESS TOKEN HERE
 
 ####
 
+###
+### ---------------------- TREATMENTS CRUD (ADDED) ----------------------
+
+# 1) Login to get a token (use an existing user from your earlier register tests)
+POST {{baseUrl}}/api/auth/login-email
+Content-Type: application/json
+
+{
+  "email": "john.doe@example.com",
+  "password": "SecurePassword123"
+}
+
+# Copy the "access" token value from the response into {{token}} below
+@token = PASTE_ACCESS_TOKEN_HERE
+
+# 2) Get my user id for path parameter (optional if you already know it)
+GET {{baseUrl}}/api/users/me
+Authorization: Bearer {{token}}
+
+# Replace {{uid}} below with the numeric "id" from /api/users/me
+@uid = 1
+
+### List treatments (empty initially)
+GET {{baseUrl}}/api/user/{{uid}}/treatments?page=1&per_page=20
+Authorization: Bearer {{token}}
+
+### Create treatment
+POST {{baseUrl}}/api/user/{{uid}}/treatments
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "treatment_name": "Metformin 500mg",
+  "scheduled_on": "Oct 12, 2025",
+  "notes": "Take with breakfast",
+  "is_completed": false
+}
+
+### Get one treatment (use id returned from list/create; assuming 1 here)
+GET {{baseUrl}}/api/user/{{uid}}/treatments/1
+Authorization: Bearer {{token}}
+
+### Update treatment (partial)
+PATCH {{baseUrl}}/api/user/{{uid}}/treatments/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "is_completed": true,
+  "notes": "Completed this morning"
+}
+
+### Delete treatment
+DELETE {{baseUrl}}/api/user/{{uid}}/treatments/1
+Authorization: Bearer {{token}}
+
+
