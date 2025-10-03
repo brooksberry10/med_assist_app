@@ -51,7 +51,7 @@ def get_symptoms_all(id):
         per_page=per_page
     )
 
-    result = DailySymptomsForm().dump(symptoms, many=True)
+    result = DailySymptomsForm().dump(symptoms.items, many=True)
 
     return jsonify({
         "symptoms": result,
