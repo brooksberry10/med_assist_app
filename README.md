@@ -88,20 +88,29 @@ flask db upgrade
 With the backend running (`flask run` shows http://127.0.0.1:5001) and `.env` containing `SECRET_KEY` + `JWT_SECRET_KEY`, open PowerShell (venv active) and paste the block from scripts/treatments-crud-copypaste.ps1
 
 
-## Set up React App
+## Set up React App (Vite)
 1. open a second terminal and navigate to frontend directory
-2. install react
+2. install dependencies
     ```bash
     cd frontend
     npm install
 
 3. Test starting the react app
     ```bash
-    npm start
+    npm run dev
 - opens on http://localhost:3000
-- if you change your flask port, you must match the proxy number in frontend/package.json
+- Vite provides fast hot module replacement (HMR)
+- proxy configuration is in frontend/vite.config.ts
 
-4. See /frontend/README.md for more info
+4. Build for production
+    ```bash
+    npm run build
+    ```
+
+5. Preview production build
+    ```bash
+    npm run preview
+    ```
 ---
 
 
@@ -139,7 +148,7 @@ With the backend running (`flask run` shows http://127.0.0.1:5001) and `.env` co
 - run react from frontend directory
     ```bash
     cd frontend
-    npm start
+    npm run dev
 
 ### Making Model Changes
 If you add or edit models in `backend/models.py`, you must generate a new migration so teammates can update their database.
@@ -166,7 +175,7 @@ If you add or edit models in `backend/models.py`, you must generate a new migrat
 
 - Restart flask when changing python code, installing packages, or changing env. turn off when using git
 
-- React auto-reloads on file saves. Only need to restart with changes to frontend/package.json proxy or envs, or when making package changes. turn off when using git
+- React auto-reloads on file saves with Vite's fast HMR. Only need to restart with changes to frontend/vite.config.ts proxy or envs, or when making package changes. turn off when using git
 
 - backend package additions should be added to requirements.txt (backend) or frontend/package.json (frontend) for teamates to install.
     ```bash

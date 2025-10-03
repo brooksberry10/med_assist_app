@@ -21,8 +21,15 @@ def verify_user_access(user_id):
 
 
 @users_bp.route('/users/me', methods=['GET'])
+@jwt_required()
 def users_me():
-    return "profile page", 200, {"Content-Type": "text/plain; charset=utf-8"}
+    current_user_id = int(get_jwt_identity())
+    user = Users.query.get(current_user_id)
+    
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+    
+    return jsonify(user.to_dict()), 200
 
 
 @users_bp.route('/user-required-info/<int:id>', methods=['GET'])
