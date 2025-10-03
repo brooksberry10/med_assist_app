@@ -1,17 +1,44 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import AppNavbar from '../components/Navbar'
 import AppFooter from '../components/Footer'
+import AuthService from '../utils/auth'
+import { useNavigate } from 'react-router-dom'
 
 export default function Profile() {
-  // User basic info (from Users model) - read only
-  const userInfo = {
-    firstName: 'John',
-    lastName: 'Doe',
-    username: 'johndoe',
-    email: 'john.doe@example.com'
-  }
+  const navigate = useNavigate()
+  const [userInfo, setUserInfo] = useState({
+    firstName: '',
+    lastName: '',
+    username: '',
+    email: ''
+  })
+  const [loadingUser, setLoadingUser] = useState(true)
 
-  // Extended user info (from UserInfo model) - all editable
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const user = await AuthService.getCurrentUser()
+        if (user) {
+          setUserInfo({
+            firstName: user.first_name,
+            lastName: user.last_name,
+            username: user.username,
+            email: user.email
+          })
+        } else {
+          navigate('/signin')
+        }
+      } catch (error) {
+        console.error('Failed to fetch user:', error)
+        navigate('/signin')
+      } finally {
+        setLoadingUser(false)
+      }
+    }
+
+    fetchUser()
+  }, [navigate])
+
   const [age, setAge] = useState(28)
   const [gender, setGender] = useState('Male')
   const [weight, setWeight] = useState(175)
@@ -39,6 +66,20 @@ export default function Profile() {
       else if (field === 'medical') setLoadingMedical(false)
       else if (field === 'insurance') setLoadingInsurance(false)
     }, 2000)
+  }
+
+  if (loadingUser) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <svg className="animate-spin h-12 w-12 text-purple-700 mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <p className="text-gray-600">Loading profile...</p>
+        </div>
+      </div>
+    )
   }
 
   return (

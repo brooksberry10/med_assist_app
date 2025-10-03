@@ -22,7 +22,13 @@ def register():
     try:
         validate = schema.load(data)
     except ValidationError as error:
-        return jsonify({"errors": error.messages}), 400
+        error_messages = []
+        for field, messages in error.messages.items():
+            if isinstance(messages, list):
+                error_messages.extend(messages)
+            else:
+                error_messages.append(str(messages))
+        return jsonify({"error": " ".join(error_messages)}), 400
 
     user = Users(
         first_name=validate['first_name'],
@@ -43,7 +49,13 @@ def login_email():
     try:
         validate = schema.load(request.get_json())
     except ValidationError as error:
-        return jsonify({"error": error.messages}), 400
+        error_messages = []
+        for field, messages in error.messages.items():
+            if isinstance(messages, list):
+                error_messages.extend(messages)
+            else:
+                error_messages.append(str(messages))
+        return jsonify({"error": " ".join(error_messages)}), 400
 
     user = Users.query.filter_by(email=validate['email']).first()
 
@@ -69,7 +81,13 @@ def login_username():
     try:
         validate = schema.load(request.get_json())
     except ValidationError as error:
-        return jsonify({"error": error.messages}), 400
+        error_messages = []
+        for field, messages in error.messages.items():
+            if isinstance(messages, list):
+                error_messages.extend(messages)
+            else:
+                error_messages.append(str(messages))
+        return jsonify({"error": " ".join(error_messages)}), 400
 
     user = Users.query.filter_by(username=validate['username']).first()
 
