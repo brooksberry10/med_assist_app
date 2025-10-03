@@ -43,6 +43,13 @@
     docker compose ps
     docker compose logs -f db
 
+### Apply Database Migrations
+We use Flask-Migrate to handle schema changes.  
+
+After starting the Postgres container, always run:
+```bash
+flask db upgrade
+```
 
 
 ## Set up Flask
@@ -116,6 +123,10 @@
     docker compose up -d
     docker info
 
+- Apply any new migrations (required if added models)
+    ```bash
+    flask db upgrade
+
 - run flask from root directory
     ```bash
     flask run
@@ -124,6 +135,23 @@
     ```bash
     cd frontend
     npm run dev
+
+### Making Model Changes
+If you add or edit models in `backend/models.py`, you must generate a new migration so teammates can update their database.
+
+1. Generate a migration:
+    ```bash
+    flask db migrate -m "describe your change"
+    ```
+
+2. Apply it locally:
+    ```bash
+    flask db upgrade
+    ```
+
+3. Commit the new file inside the `migrations/versions/` folder.  
+4. Push your changes so teammates can run `flask db upgrade` after pulling.
+
 
 ### For testing and changes
  - Restart docker connection only for changes to the docker-compose.yml. turn off when using git
