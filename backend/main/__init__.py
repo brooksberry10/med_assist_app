@@ -3,6 +3,7 @@ from .config import Config
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
+from backend.main.routes.treatments import treatments_bp
 
 db = SQLAlchemy()
 jwt = JWTManager()
@@ -27,6 +28,7 @@ def create_app():
     app.register_blueprint(users_bp)
     app.register_blueprint(symptoms_bp)
     app.register_blueprint(food_logs_bp)
+    app.register_blueprint(treatments_bp)
 
     # Create tables if they don't exist (dev convenience; migrations are preferred)
     with app.app_context():
