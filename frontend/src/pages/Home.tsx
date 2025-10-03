@@ -1,24 +1,7 @@
-import { useEffect, useState } from 'react'
 import AppNavbar from '../components/Navbar'
 import AppFooter from '../components/Footer'
 
 export default function Home() {
-  const [text, setText] = useState("Loading...")
-  const [isLoading, setIsLoading] = useState(true)
-
-  useEffect(() => {
-    fetch("/api/users/me")
-      .then((r) => r.text())
-      .then((data) => {
-        setText(data)
-        setIsLoading(false)
-      })
-      .catch((e) => {
-        setText("error: " + e.message)
-        setIsLoading(false)
-      });
-  }, []);
-
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <AppNavbar />
@@ -31,16 +14,9 @@ export default function Home() {
           
           <div className="bg-gradient-to-br from-purple-50 to-purple-100 border-2 border-purple-300 rounded-lg p-8 mb-6 shadow-inner">
             <h2 className="text-2xl font-semibold text-purple-900 mb-4 text-center">
-              API Test Results
+              Some Content Here
             </h2>
-            {isLoading ? (
-              <div className="flex items-center justify-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-700"></div>
-                <span className="ml-3 text-gray-700 text-lg">Loading...</span>
-              </div>
-            ) : (
-              <p className="text-gray-800 text-xl text-center font-medium">{text}</p>
-            )}
+            <p className="text-gray-800 text-xl text-center font-medium">Welcome!</p>
           </div>
           
           <div className="text-center">
