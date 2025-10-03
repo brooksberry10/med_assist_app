@@ -26,13 +26,19 @@ export default function AppNavbar() {
             </a>
           </div>
           
-          {/* sign in button */}
-          <div className="flex-shrink-0">
+          {/* auth buttons */}
+          <div className="flex-shrink-0 flex items-center space-x-4">
             <a 
-              href="#" 
-              className="bg-gradient-to-r from-purple-700 to-purple-900 hover:from-purple-800 hover:to-purple-950 text-white px-6 py-2.5 rounded-lg text-lg font-medium transition-all shadow-md hover:shadow-lg"
+              href="/signin" 
+              className="bg-gradient-to-r from-purple-700 to-purple-900 hover:from-purple-800 hover:to-purple-950 text-white px-6 py-2.5 rounded-lg text-lg font-medium transition-all shadow-md hover:shadow-xl hover:-translate-y-0.5"
             >
               Sign In
+            </a>
+            <a 
+              href="/register" 
+              className="text-purple-700 hover:text-white px-6 py-2.5 rounded-lg text-lg font-medium transition-all border-2 border-purple-700 hover:bg-purple-700 hover:-translate-y-0.5 hover:shadow-lg"
+            >
+              Sign Up
             </a>
           </div>
         </div>
