@@ -60,6 +60,8 @@ flask db upgrade
     FLASK_APP=backend.main
     FLASK_RUN_PORT=5001
     DATABASE_URL=postgresql+psycopg2://ma_user:ma_user@localhost:5433/med_assist_db
+    SECRET_KEY=dev-secret-change-me
+    JWT_SECRET_KEY=dev-jwt-secret-change-me
 
 ### Test flask and API route 
 3. Test flask
@@ -72,6 +74,18 @@ flask db upgrade
     curl.exe http://127.0.0.1:5001
 - Or visit http://127.0.0.1:5001
 - a test route to try: http://127.0.0.1:5001/api/users/me
+
+### Treatments Endpoints
+- `GET /api/user/<id>/treatments?page=&per_page=` — list (paginated)
+- `GET /api/user/<id>/treatments/<treatment_id>` — get one
+- `POST /api/user/<id>/treatments` — create
+- `PATCH /api/user/<id>/treatments/<treatment_id>` — update (partial)
+- `DELETE /api/user/<id>/treatments/<treatment_id>` — delete
+
+
+## Quick Treatments test (PowerShell copy-paste)
+
+With the backend running (`flask run` shows http://127.0.0.1:5001) and `.env` containing `SECRET_KEY` + `JWT_SECRET_KEY`, open PowerShell (venv active) and paste the block from scripts/treatments-crud-copypaste.ps1
 
 
 ## Set up React App
