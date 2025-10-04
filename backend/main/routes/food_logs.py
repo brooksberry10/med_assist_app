@@ -90,6 +90,6 @@ def add_foodlog(id):
         foodlog.save()
         return jsonify({"message": "Food log added successfully"}), 201
         
-    except Exception as e:
+    except Exception:
         return jsonify({"error": "Failed to add food log"}), 500
 
