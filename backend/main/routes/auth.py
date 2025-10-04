@@ -16,11 +16,10 @@ auth_bp = Blueprint('auth', __name__, url_prefix='/api/auth')
 
 @auth_bp.route('/register', methods=['POST'])
 def register():
-    data = request.get_json()
     schema = RegistrationForm()
 
     try:
-        validate = schema.load(data)
+        validate = schema.load(request.get_json())
     except ValidationError as error:
         error_messages = []
         for field, messages in error.messages.items():
