@@ -61,7 +61,7 @@ CREATE TABLE labs (
     id BIGINT NOT NULL,
     -- Both systolic and diastolic are needed to calculate blood pressure --
     systolic_pressure INT,
-    diastolic_pressure INT
+    diastolic_pressure INT,
 	rbc_count FLOAT,
     FOREIGN KEY (id) REFERENCES users(id) ON DELETE CASCADE
     --not finished
