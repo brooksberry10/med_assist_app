@@ -150,7 +150,7 @@ class TreatmentsForm(Schema):
     is_completed = fields.Boolean(data_key='is_completed')
 
 class FoodLogForm(Schema):
-    foodlog_id = fields.Integer(data_key='lab_id')
+    foodlog_id = fields.Integer(data_key='foodlog_id')
     notes = fields.String(data_key='notes')
     total_calories = fields.Float(data_key='total_calories', validate=validate.Range(min = 0))
     recorded_on = fields.DateTime(data_key='recorded_on', format='%b %d, %Y')
