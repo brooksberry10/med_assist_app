@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import AuthService, { UserData } from '../utils/auth'
+import AuthService from '../utils/auth'
+import type { UserData } from '../utils/auth'
 
 interface UseAuthReturn {
   user: UserData | null

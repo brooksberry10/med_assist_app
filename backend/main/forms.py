@@ -39,14 +39,14 @@ class RegistrationForm(Schema):
         user = Users.query.filter_by(email = data).first()
         
         if user:
-            raise ValidationError("Email already exist")
+            raise ValidationError("Email already exists")
         
     @validates('username')
     def validate_username(self, data, **kwargs):
         user = Users.query.filter_by(username = data).first()
         
         if user:
-            raise ValidationError('Username already exist')
+            raise ValidationError('Username already exists')
         
     @validates_schema
     def validate_password(self,data,**kwargs):
@@ -70,7 +70,7 @@ class UserSchema(Schema):
     id = fields.Integer(data_key='id')
 
     first_name = fields.String(data_key='first_name',required=True, validate=[validate.Length(min = min_name_length, max=max_name_length,error=f"First name must be between {min_name_length} and {max_name_length} characters")])
-    last_name = fields.String(data_key='last_name', validate=[validate.Length(max=max_name_length, error=f'Last name must be less than {max_name_length}')])
+    last_name = fields.String(data_key='last_name', validate=[validate.Length(max=max_name_length, error=f'Last name must be less than {max_name_length} characters')])
 
     username = fields.String(data_key='username', required=True, validate=[validate.Length(min=min_username_length, max=max_username_length, error= f"Username must be between {min_username_length} and {max_username_length} characters")])
 
@@ -80,7 +80,7 @@ class UserSchema(Schema):
 class UserInfoForm(Schema):
     #AGE
     min_age_range = 18
-    max_age_range = 120
+    max_age_range = 130
 
     #GENDER
     max_gender_length = 10
