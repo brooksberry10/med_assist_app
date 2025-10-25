@@ -22,8 +22,13 @@ def create_app():
     from .models import Users, TokenBlockList
 
     # Import and register blueprints
-    from .routes import auth_bp, users_bp, symptoms_bp, food_logs_bp
-    from backend.main.routes.treatments import treatments_bp
+    from .routes import (
+        auth_bp, 
+        users_bp, 
+        symptoms_bp, 
+        food_logs_bp, 
+        treatments_bp,
+    )
     
     app.register_blueprint(auth_bp)
     app.register_blueprint(users_bp)
