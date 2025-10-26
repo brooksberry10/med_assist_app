@@ -15,7 +15,7 @@ CREATE TABLE user_info(
     gender VARCHAR(10),
     weight_lbs FLOAT,
     height_ft INT,
-    height_inch INT,
+    height_in INT,
     current_diagnoses TEXT,
     medical_history TEXT,
 	insurance TEXT,
