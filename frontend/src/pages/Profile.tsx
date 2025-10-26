@@ -48,16 +48,6 @@ export default function Profile() {
   const [medical_history, setMedical_history] = useState('Appendectomy (2015), Seasonal allergies')
   const [insurance, setInsurance] = useState('Blue Cross Blue Shield - PPO Plan')
 
-  console.log({
-  age,
-  gender,
-  weight_lbs,
-  height_ft,
-  height_in,
-  current_diagnoses,
-  medical_history,
-  insurance
-  })
 
   // Loading states for each card
   const [loadingPhysical, setLoadingPhysical] = useState(false)
