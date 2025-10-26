@@ -1,0 +1,133 @@
+# ------------------------------------------------------------
+# Test: Food Log Pagination Manual Test
+# PURPOSE: Verify that authenticated users can create food logs,
+#          retrieve them with pagination, and that the response
+#          includes correct meal data and metadata fields.
+# ------------------------------------------------------------
+
+### Test Flask Backend is Running
+GET http://localhost:5001/
+
+###
+
+@baseUrl = http://localhost:5001/
+
+### ---------------------- AUTHENTICATION & SETUP ----------------------
+
+### Register Test User
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "first_name": "Food",
+  "last_name": "Tester",
+  "username": "foodtester1",
+  "email": "foodtester1@example.com",
+  "password": "password123",
+  "confirm_password": "password123"
+}
+
+###
+
+### Login Test User
+POST {{baseUrl}}/api/auth/login-email
+Content-Type: application/json
+
+{
+  "email": "foodtester1@example.com",
+  "password": "password123"
+}
+
+# Copy "access" token from the response into {{token}} below
+@token = PASTE_ACCESS_TOKEN_HERE
+
+###
+
+### Get Current User Info (to retrieve user id)
+GET {{baseUrl}}/api/users/me
+Authorization: Bearer {{token}}
+
+# Copy the "id" value from this response into {{uid}} below
+@uid = 3
+
+###
+
+### ---------------------- FOOD LOGS TESTS ----------------------
+
+### 1) Create Food Log #1
+POST {{baseUrl}}/api/user/{{uid}}/food-logs
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "breakfast": "oatmeal and berries",
+  "lunch": "chicken salad",
+  "dinner": "salmon and rice",
+  "notes": "felt fine today",
+  "total_calories": 1800
+}
+
+###
+
+### 2) Create Food Log #2
+POST {{baseUrl}}/api/user/{{uid}}/food-logs
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "breakfast": "eggs and toast",
+  "lunch": "turkey wrap",
+  "dinner": "pasta and broccoli",
+  "notes": "slightly tired",
+  "total_calories": 2000
+}
+
+###
+
+### 3) Create Food Log #3
+POST {{baseUrl}}/api/user/{{uid}}/food-logs
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "breakfast": "greek yogurt",
+  "lunch": "sushi",
+  "dinner": "steak and potatoes",
+  "notes": "high protein day",
+  "total_calories": 2300
+}
+
+###
+
+### 4) Get Food Logs - Page 1 (per_page=2)
+GET {{baseUrl}}/api/user/{{uid}}/food-logs?page=1&per_page=2
+Authorization: Bearer {{token}}
+
+# Expected:
+# - Status: 200
+# - "foodlogs" array length = 2
+# - "total_num_of_foodlogs" = 3
+# - "total_pages" = 2
+# - "current_page" = 1
+
+###
+
+### 5) Get Food Logs - Page 2 (per_page=2)
+GET {{baseUrl}}/api/user/{{uid}}/food-logs?page=2&per_page=2
+Authorization: Bearer {{token}}
+
+# Expected:
+# - Status: 200
+# - "foodlogs" array length = 1
+# - "total_num_of_foodlogs" = 3
+# - "total_pages" = 2
+# - "current_page" = 2
+
+###
+
+### 6) Validate Meal Data Matches Input
+# Visually confirm that each object in "foodlogs" contains:
+# - breakfast / lunch / dinner
+# - notes
+# - total_calories
+# and that they match what was sent in steps 1-3.
