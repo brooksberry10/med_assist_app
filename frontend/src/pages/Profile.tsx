@@ -41,12 +41,23 @@ export default function Profile() {
 
   const [age, setAge] = useState(28)
   const [gender, setGender] = useState('Male')
-  const [weight, setWeight] = useState(175)
-  const [heightFt, setHeightFt] = useState(5)
-  const [heightIn, setHeightIn] = useState(10)
-  const [diagnoses, setDiagnoses] = useState('Type 2 Diabetes, Hypertension')
-  const [medicalHistory, setMedicalHistory] = useState('Appendectomy (2015), Seasonal allergies')
+  const [weight_lbs, setWeight_lbs] = useState(175)
+  const [height_ft, setHeight_ft] = useState(5)
+  const [height_in, setHeight_in] = useState(10)
+  const [current_diagnoses, setCurrent_diagnoses] = useState('Type 2 Diabetes, Hypertension')
+  const [medical_history, setMedical_history] = useState('Appendectomy (2015), Seasonal allergies')
   const [insurance, setInsurance] = useState('Blue Cross Blue Shield - PPO Plan')
+
+  console.log({
+  age,
+  gender,
+  weight_lbs,
+  height_ft,
+  height_in,
+  current_diagnoses,
+  medical_history,
+  insurance
+  })
 
   // Loading states for each card
   const [loadingPhysical, setLoadingPhysical] = useState(false)
@@ -150,8 +161,8 @@ export default function Profile() {
                   <div className="flex items-center">
                     <input
                       type="number"
-                      value={weight}
-                      onChange={(e) => setWeight(parseFloat(e.target.value))}
+                      value={weight_lbs}
+                      onChange={(e) => setWeight_lbs(parseFloat(e.target.value))}
                       className="flex-1 px-4 py-2.5 border-2 border-gray-300 rounded-lg focus:border-purple-600 focus:outline-none transition-colors"
                     />
                     <span className="ml-3 text-gray-600 font-medium">lbs</span>
@@ -164,8 +175,8 @@ export default function Profile() {
                     <div className="flex items-center flex-1">
                       <input
                         type="number"
-                        value={heightFt}
-                        onChange={(e) => setHeightFt(parseInt(e.target.value))}
+                        value={height_ft}
+                        onChange={(e) => setHeight_ft(parseInt(e.target.value))}
                         className="w-full px-4 py-2.5 border-2 border-gray-300 rounded-lg focus:border-purple-600 focus:outline-none transition-colors"
                       />
                       <span className="ml-2 text-gray-600 font-medium">ft</span>
@@ -173,8 +184,8 @@ export default function Profile() {
                     <div className="flex items-center flex-1">
                       <input
                         type="number"
-                        value={heightIn}
-                        onChange={(e) => setHeightIn(parseInt(e.target.value))}
+                        value={height_in}
+                        onChange={(e) => setHeight_in(parseInt(e.target.value))}
                         className="w-full px-4 py-2.5 border-2 border-gray-300 rounded-lg focus:border-purple-600 focus:outline-none transition-colors"
                       />
                       <span className="ml-2 text-gray-600 font-medium">in</span>
@@ -210,8 +221,8 @@ export default function Profile() {
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">Current Diagnoses</label>
                   <textarea
-                    value={diagnoses}
-                    onChange={(e) => setDiagnoses(e.target.value)}
+                    value={current_diagnoses}
+                    onChange={(e) => setCurrent_diagnoses(e.target.value)}
                     rows={4}
                     className="w-full px-4 py-2.5 border-2 border-gray-300 rounded-lg focus:border-purple-600 focus:outline-none transition-colors resize-none"
                     placeholder="Enter your current diagnoses..."
@@ -221,8 +232,8 @@ export default function Profile() {
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">Medical History</label>
                   <textarea
-                    value={medicalHistory}
-                    onChange={(e) => setMedicalHistory(e.target.value)}
+                    value={medical_history}
+                    onChange={(e) => setMedical_history(e.target.value)}
                     rows={4}
                     className="w-full px-4 py-2.5 border-2 border-gray-300 rounded-lg focus:border-purple-600 focus:outline-none transition-colors resize-none"
                     placeholder="Enter your medical history..."
