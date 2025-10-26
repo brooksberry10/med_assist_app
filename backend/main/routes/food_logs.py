@@ -53,7 +53,7 @@ def get_all_foodlogs(id):
         per_page=per_page,
     )
 
-    result = FoodLogForm().dump(foodlogs_all, many=True)
+    result = FoodLogForm().dump(foodlogs_all.items, many=True)
 
     return jsonify({
         "foodlogs": result,

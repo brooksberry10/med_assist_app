@@ -152,6 +152,9 @@ class TreatmentsForm(Schema):
 class FoodLogForm(Schema):
     foodlog_id = fields.Integer(data_key='foodlog_id')
     notes = fields.String(data_key='notes')
+    breakfast = fields.String(data_key='breakfast')
+    lunch = fields.String(data_key='lunch')
+    dinner = fields.String(data_key='dinner')
     total_calories = fields.Float(data_key='total_calories', validate=validate.Range(min = 0))
     recorded_on = fields.DateTime(data_key='recorded_on', format='%b %d, %Y')
 
