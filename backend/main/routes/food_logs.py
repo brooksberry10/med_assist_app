@@ -118,7 +118,7 @@ def edit_foodlog(id, foodlog_id):
 
         db.session.commit()
         return jsonify({'message': 'Food Log updated successfully'}), 200
-    except Exception as e:
+    except Exception:
         db.session.rollback()
         return {"error": "Failed to update treatment"}, 500
 
