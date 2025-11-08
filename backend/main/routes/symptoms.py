@@ -91,6 +91,7 @@ def add_symptoms(id):
         return jsonify({"error": "Failed to log symptom"}), 500
     
 
+
 @symptoms_bp.route('/symptom/<int:symptom_id>/delete', methods = ["DELETE"])
 @jwt_required()
 def delete_symptom(id, symptom_id):
@@ -140,4 +141,3 @@ def edit_symptom(id, symptom_id):
     except Exception:
         db.session.rollback()
         return {"error": "Failed to update treatment"}, 500
-    
