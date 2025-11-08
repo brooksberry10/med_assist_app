@@ -1,7 +1,9 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
-from ..models import Users
+from ..models import Users, UserInfo
+from ..forms import UserInfoForm
+from .. import db
 
 
 users_bp = Blueprint('users', __name__, url_prefix='/api')
@@ -52,4 +54,44 @@ def get_user_info(id):
     return jsonify({
         'user_info': user.user_info.to_dict() if user.user_info else None
     }), 200
+
+
+@users_bp.route('/user-info/<int:id>', methods=['PATCH'])
+@jwt_required()
+def update_user_info(id):
+    user, error = verify_user_access(id)
+    if error:
+        return error
+    
+    json_data = request.get_json() or {}
+    form = UserInfoForm(partial=True)
+    
+    try:
+        validated_data = form.load(json_data)
+    except Exception as e:
+        error_msg = str(e)
+        if hasattr(e, 'messages'):
+            error_msg = str(e.messages)
+        return jsonify({"error": f"Validation error: {error_msg}"}), 400
+    
+    try:
+        if not user.user_info:
+            user_info = UserInfo(id=id)
+            db.session.add(user_info)
+        else:
+            user_info = user.user_info
+        
+        for field in ['age', 'gender', 'weight_lbs', 'height_ft', 'height_in', 
+                      'current_diagnoses', 'medical_history', 'insurance']:
+            if field in validated_data:
+                setattr(user_info, field, validated_data[field])
+        
+        db.session.commit()
+        return jsonify({
+            "message": "User info updated successfully",
+            "user_info": user_info.to_dict()
+        }), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": f"Database error: {str(e)}"}), 500
 
