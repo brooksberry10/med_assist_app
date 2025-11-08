@@ -43,13 +43,13 @@ class UserInfo(db.Model):
     user_info_id = Column(BigInteger, primary_key=True, autoincrement=True)
     id = Column(BigInteger, ForeignKey('users.id'), nullable=False)
     age = Column(Integer, default=0)
-    gender = Column(String(10), default='Not specified')
+    gender = Column(String(10), default='Other')
     weight_lbs = Column(Float, default=0.0)
     height_ft = Column(Integer, default=0)
     height_in = Column(Integer, default=0)
-    current_diagnoses = Column(Text(), default='Not provided')
-    medical_history = Column(Text(), default='Not provided')
-    insurance = Column(Text(), default='Not provided')
+    current_diagnoses = Column(Text(), default='')
+    medical_history = Column(Text(), default='')
+    insurance = Column(Text(), default='')
 
     def save(self):
         db.session.add(self)
