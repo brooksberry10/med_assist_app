@@ -3,9 +3,11 @@ import AppNavbar from '../components/Navbar'
 import AppFooter from '../components/Footer'
 import AuthService from '../utils/auth'
 import { useNavigate } from 'react-router-dom'
+import toast, { Toaster } from 'react-hot-toast'
 
 export default function Profile() {
   const navigate = useNavigate()
+  const [userId, setUserId] = useState<number | null>(null)
   const [userInfo, setUserInfo] = useState({
     firstName: '',
     lastName: '',
@@ -14,8 +16,22 @@ export default function Profile() {
   })
   const [loadingUser, setLoadingUser] = useState(true)
 
+  const [age, setAge] = useState(0)
+  const [gender, setGender] = useState('Other')
+  const [weight_lbs, setWeight_lbs] = useState(0)
+  const [height_ft, setHeight_ft] = useState(0)
+  const [height_in, setHeight_in] = useState(0)
+  const [current_diagnoses, setCurrent_diagnoses] = useState('')
+  const [medical_history, setMedical_history] = useState('')
+  const [insurance, setInsurance] = useState('')
+
+  // Loading states for each card
+  const [loadingPhysical, setLoadingPhysical] = useState(false)
+  const [loadingMedical, setLoadingMedical] = useState(false)
+  const [loadingInsurance, setLoadingInsurance] = useState(false)
+
   useEffect(() => {
-    const fetchUser = async () => {
+    const fetchUserData = async () => {
       try {
         const user = await AuthService.getCurrentUser()
         if (user) {
@@ -25,48 +41,87 @@ export default function Profile() {
             username: user.username,
             email: user.email
           })
+          setUserId(user.id)
+
+          const response = await AuthService.authenticatedFetch(`/api/user-info/${user.id}`)
+          if (response.ok) {
+            const data = await response.json()
+            if (data.user_info) {
+              setAge(data.user_info.age || 0)
+              setGender(data.user_info.gender || 'Other')
+              setWeight_lbs(data.user_info.weight_lbs || 0)
+              setHeight_ft(data.user_info.height_ft || 0)
+              setHeight_in(data.user_info.height_in || 0)
+              setCurrent_diagnoses(data.user_info.current_diagnoses || '')
+              setMedical_history(data.user_info.medical_history || '')
+              setInsurance(data.user_info.insurance || '')
+            }
+          }
         } else {
           navigate('/signin')
         }
       } catch (error) {
         console.error('Failed to fetch user:', error)
+        toast.error('Failed to load profile data')
         navigate('/signin')
       } finally {
         setLoadingUser(false)
       }
     }
 
-    fetchUser()
+    fetchUserData()
   }, [navigate])
 
-  const [age, setAge] = useState(28)
-  const [gender, setGender] = useState('Male')
-  const [weight_lbs, setWeight_lbs] = useState(175)
-  const [height_ft, setHeight_ft] = useState(5)
-  const [height_in, setHeight_in] = useState(10)
-  const [current_diagnoses, setCurrent_diagnoses] = useState('Type 2 Diabetes, Hypertension')
-  const [medical_history, setMedical_history] = useState('Appendectomy (2015), Seasonal allergies')
-  const [insurance, setInsurance] = useState('Blue Cross Blue Shield - PPO Plan')
+  const handleUpdate = async (field: string) => {
+    if (!userId) {
+      toast.error('User not found')
+      return
+    }
 
+    let updateData: any = {}
+    
+    if (field === 'physical') {
+      setLoadingPhysical(true)
+      updateData = { age, gender, weight_lbs, height_ft, height_in }
+    } else if (field === 'medical') {
+      setLoadingMedical(true)
+      updateData = { current_diagnoses, medical_history }
+    } else if (field === 'insurance') {
+      setLoadingInsurance(true)
+      updateData = { insurance }
+    }
 
-  // Loading states for each card
-  const [loadingPhysical, setLoadingPhysical] = useState(false)
-  const [loadingMedical, setLoadingMedical] = useState(false)
-  const [loadingInsurance, setLoadingInsurance] = useState(false)
+    try {
+      const response = await AuthService.authenticatedFetch(`/api/user-info/${userId}`, {
+        method: 'PATCH',
+        body: JSON.stringify(updateData)
+      })
 
-  const handleUpdate = (field: string) => {
-    // Set loading state based on field
-    if (field === 'physical') setLoadingPhysical(true)
-    else if (field === 'medical') setLoadingMedical(true)
-    else if (field === 'insurance') setLoadingInsurance(true)
+      const data = await response.json()
 
-    // Mock API call with 2 second delay
-    setTimeout(() => {
-      console.log(`Updated ${field}!`)
+      if (response.ok) {
+        toast.success('Profile updated successfully!')
+        
+        if (data.user_info) {
+          setAge(data.user_info.age || 0)
+          setGender(data.user_info.gender || 'Other')
+          setWeight_lbs(data.user_info.weight_lbs || 0)
+          setHeight_ft(data.user_info.height_ft || 0)
+          setHeight_in(data.user_info.height_in || 0)
+          setCurrent_diagnoses(data.user_info.current_diagnoses || '')
+          setMedical_history(data.user_info.medical_history || '')
+          setInsurance(data.user_info.insurance || '')
+        }
+      } else {
+        toast.error(data.error || 'Failed to update profile')
+      }
+    } catch (error) {
+      toast.error('Failed to update profile')
+    } finally {
       if (field === 'physical') setLoadingPhysical(false)
       else if (field === 'medical') setLoadingMedical(false)
       else if (field === 'insurance') setLoadingInsurance(false)
-    }, 2000)
+    }
   }
 
   if (loadingUser) {
@@ -85,6 +140,7 @@ export default function Profile() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
+      <Toaster position="top-right" />
       <AppNavbar />
       
       <main className="flex-1 py-8 px-4">
@@ -142,7 +198,6 @@ export default function Profile() {
                     <option value="Male">Male</option>
                     <option value="Female">Female</option>
                     <option value="Other">Other</option>
-                    <option value="Not specified">Prefer not to say</option>
                   </select>
                 </div>
 
