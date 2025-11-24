@@ -28,6 +28,7 @@ def create_app():
         symptoms_bp, 
         food_logs_bp, 
         treatments_bp,
+        labs_bp,
     )
     
     app.register_blueprint(auth_bp)
@@ -35,6 +36,7 @@ def create_app():
     app.register_blueprint(symptoms_bp)
     app.register_blueprint(food_logs_bp)
     app.register_blueprint(treatments_bp)
+    app.register_blueprint(labs_bp)
 
 
     # Create tables if they don't exist (dev convenience; migrations are preferred)
