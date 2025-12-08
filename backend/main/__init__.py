@@ -82,7 +82,7 @@ def create_app():
     @app.get("/")
     def root():
         return (
-            "Med Assist backend is running. Run React app via npm start, or append url with /api/<insert_route> to view backend API endpoints.",
+            "Med Assist backend is running. Run React app via npm start.",
             200,
             {"Content-Type": "text/plain; charset=utf-8"}
         )

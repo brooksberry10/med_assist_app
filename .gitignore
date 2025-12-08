@@ -15,4 +15,8 @@ notes/dbnotes.txt
 
 frontend/node_modules/
 frontend/build/
-frontend/package-lock.json
+
+
+# frontend/package-lock.json
+#   shouldn't ignore. Needed for consistent dependency management among each team member.
+#   inconsistent dependencies may lead to unexpected bugs and issues.
