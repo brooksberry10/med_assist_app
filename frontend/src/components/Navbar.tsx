@@ -46,12 +46,7 @@ export default function AppNavbar() {
             </div>
             
             <div className="flex items-center space-x-6">
-              <Link 
-                to="/" 
-                className="text-gray-700 hover:text-purple-700 px-3 py-2 text-lg font-medium transition-colors"
-              >
-                Home
-              </Link>
+
               {isAuthenticated && (
                 <>
                   <Link 
@@ -65,7 +60,7 @@ export default function AppNavbar() {
                       onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                       className="text-gray-700 hover:text-purple-700 px-3 py-2 text-lg font-medium transition-colors flex items-center gap-1"
                     >
-                      Logging
+                      Log
                       <svg 
                         className={`w-4 h-4 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}
                         fill="none" 
@@ -82,14 +77,14 @@ export default function AppNavbar() {
                           onClick={() => setIsDropdownOpen(false)}
                           className="block px-4 py-2 text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition-colors"
                         >
-                          Treatments
+                          Treatment Logs
                         </Link>
                         <Link
                           to="/symptoms"
                           onClick={() => setIsDropdownOpen(false)}
                           className="block px-4 py-2 text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition-colors"
                         >
-                          Symptoms
+                          Symptom Logs
                         </Link>
                         <Link
                           to="/food-logs"
