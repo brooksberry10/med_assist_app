@@ -79,17 +79,17 @@ class UserSchema(Schema):
 
 class UserInfoForm(Schema):
     #AGE
-    min_age_range = 18
-    max_age_range = 130
+    min_age_range = 0
+    max_age_range = 300
 
     #GENDER
     max_gender_length = 10
 
     #WEIGHT
-    max_weight_range = 1400.0
+    max_weight_range = 2000.0
 
     #HEIGHT FEET
-    max_height_feet_range = 10
+    max_height_feet_range = 20
 
     #HEIGHT INCHES
     max_height_inch_range = 11
