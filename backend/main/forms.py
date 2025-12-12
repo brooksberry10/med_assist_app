@@ -103,7 +103,7 @@ class UserInfoForm(Schema):
 
     age = fields.Integer(data_key='age',validate=[validate.Range(min_age_range, max_age_range, error=f'Age must be between {min_age_range} and {max_age_range}')])
 
-    gender = fields.String(data_key='gender',validate= validate.Length(max=max_age_range,error = f"Gender must be less than {max_gender_length}"))
+    gender = fields.String(data_key='gender',validate= validate.Length(max=max_gender_length, error = f"Gender must be less than {max_gender_length}"))
 
     weight_lbs = fields.Float(data_key='weight_lbs',validate=validate.Range(min=0.0,max=max_weight_range, error=f'Weight must be between 0.0lb and {max_weight_range}lb'))
 

@@ -14,10 +14,11 @@ function App() {
     <HeroUIProvider>
       <Router>
         <Routes>
-          <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
-          <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+          <Route path="/" element={<Home />} />
           <Route path="/signin" element={<SignIn />} />
           <Route path="/register" element={<SignUp />} />
+
+          <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/treatments" element={<ProtectedRoute><Treatments /></ProtectedRoute>} />
           <Route path="/symptoms" element={<ProtectedRoute><Symptoms /></ProtectedRoute>} />
           <Route path="/food-logs" element={<ProtectedRoute><FoodLogs /></ProtectedRoute>} />
