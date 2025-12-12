@@ -14,6 +14,7 @@ export default function Profile() {
   })
   const [loadingUser, setLoadingUser] = useState(true)
 
+  const [email, setEmail] = useState('')
   const [age, setAge] = useState(0)
   const [gender, setGender] = useState('Other')
   const [weight_lbs, setWeight_lbs] = useState(0)
@@ -24,6 +25,7 @@ export default function Profile() {
   const [insurance, setInsurance] = useState('')
 
   // Loading states for each card
+  const [loadingAccount, setLoadingAccount] = useState(false)
   const [loadingPhysical, setLoadingPhysical] = useState(false)
   const [loadingMedical, setLoadingMedical] = useState(false)
   const [loadingInsurance, setLoadingInsurance] = useState(false)
@@ -39,6 +41,7 @@ export default function Profile() {
             username: user.username,
             email: user.email
           })
+          setEmail(user.email)
           setUserId(user.id)
 
           const response = await AuthService.authenticatedFetch(`/api/user-info/${user.id}`)
@@ -73,8 +76,22 @@ export default function Profile() {
     }
 
     let updateData: any = {}
+    let endpoint = `/api/user-info/${userId}`
     
-    if (field === 'physical') {
+    if (field === 'account') {
+      if (!email.trim()) {
+        toast.error('Email is required')
+        return
+      }
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+      if (!emailRegex.test(email)) {
+        toast.error('Please enter a valid email address')
+        return
+      }
+      setLoadingAccount(true)
+      endpoint = `/api/user-account/${userId}`
+      updateData = { email }
+    } else if (field === 'physical') {
       setLoadingPhysical(true)
       updateData = { age, gender, weight_lbs, height_ft, height_in }
     } else if (field === 'medical') {
@@ -86,7 +103,7 @@ export default function Profile() {
     }
 
     try {
-      const response = await AuthService.authenticatedFetch(`/api/user-info/${userId}`, {
+      const response = await AuthService.authenticatedFetch(endpoint, {
         method: 'PATCH',
         body: JSON.stringify(updateData)
       })
@@ -96,7 +113,15 @@ export default function Profile() {
       if (response.ok) {
         toast.success('Profile updated successfully!')
         
-        if (data.user_info) {
+        if (field === 'account' && data.user) {
+          setUserInfo({
+            firstName: data.user.first_name,
+            lastName: data.user.last_name,
+            username: data.user.username,
+            email: data.user.email
+          })
+          setEmail(data.user.email)
+        } else if (data.user_info) {
           setAge(data.user_info.age || 0)
           setGender(data.user_info.gender || 'Other')
           setWeight_lbs(data.user_info.weight_lbs || 0)
@@ -112,7 +137,8 @@ export default function Profile() {
     } catch (error) {
       toast.error('Failed to update profile')
     } finally {
-      if (field === 'physical') setLoadingPhysical(false)
+      if (field === 'account') setLoadingAccount(false)
+      else if (field === 'physical') setLoadingPhysical(false)
       else if (field === 'medical') setLoadingMedical(false)
       else if (field === 'insurance') setLoadingInsurance(false)
     }
@@ -164,11 +190,47 @@ export default function Profile() {
             </div>
           </div>
 
-          {/* editable cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            
-            {/* physical info */}
-            <div className="bg-white rounded-xl shadow-lg p-6 flex flex-col">
+                {/* editable cards */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  
+                  {/* account info */}
+                  <div className="bg-white rounded-xl shadow-lg p-6 flex flex-col md:col-span-2">
+                    <h3 className="text-2xl font-bold text-purple-800 mb-6">Account Information</h3>
+                    
+                    <div className="space-y-4 mb-6 flex-1">
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">Email</label>
+                        <input
+                          type="email"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          className="w-full px-4 py-2.5 border-2 border-gray-300 rounded-lg focus:border-purple-600 focus:outline-none transition-colors"
+                          placeholder="your.email@example.com"
+                        />
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => handleUpdate('account')}
+                      disabled={loadingAccount}
+                      className="bg-gradient-to-r from-purple-700 to-purple-900 hover:from-purple-800 hover:to-purple-950 text-white px-6 py-3 rounded-lg font-medium transition-all shadow-md hover:shadow-xl hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center"
+                    >
+                      {loadingAccount ? (
+                        <>
+                          <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          Updating...
+                        </>
+                      ) : (
+                        'Update'
+                      )}
+                    </button>
+                  </div>
+
+                  {/* physical info */}
+                  <div className="bg-white rounded-xl shadow-lg p-6 flex flex-col">
               <h3 className="text-2xl font-bold text-purple-800 mb-6">Physical Information</h3>
               
               <div className="space-y-4 mb-6 flex-1">
