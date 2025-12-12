@@ -7,6 +7,7 @@ export default function AppNavbar() {
   const location = useLocation()
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [username, setUsername] = useState('')
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -45,19 +46,57 @@ export default function AppNavbar() {
             </div>
             
             <div className="flex items-center space-x-6">
-              <Link 
-                to="/" 
-                className="text-gray-700 hover:text-purple-700 px-3 py-2 text-lg font-medium transition-colors"
-              >
-                Home
-              </Link>
+
               {isAuthenticated && (
-                <Link 
-                  to="/profile" 
-                  className="text-gray-700 hover:text-purple-700 px-3 py-2 text-lg font-medium transition-colors"
-                >
-                  Profile
-                </Link>
+                <>
+                  <Link 
+                    to="/profile" 
+                    className="text-gray-700 hover:text-purple-700 px-3 py-2 text-lg font-medium transition-colors"
+                  >
+                    Profile
+                  </Link>
+                  <div className="relative">
+                    <button
+                      onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                      className="text-gray-700 hover:text-purple-700 px-3 py-2 text-lg font-medium transition-colors flex items-center gap-1"
+                    >
+                      Log
+                      <svg 
+                        className={`w-4 h-4 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}
+                        fill="none" 
+                        stroke="currentColor" 
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                    {isDropdownOpen && (
+                      <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+                        <Link
+                          to="/treatments"
+                          onClick={() => setIsDropdownOpen(false)}
+                          className="block px-4 py-2 text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition-colors"
+                        >
+                          Treatment Logs
+                        </Link>
+                        <Link
+                          to="/symptoms"
+                          onClick={() => setIsDropdownOpen(false)}
+                          className="block px-4 py-2 text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition-colors"
+                        >
+                          Symptom Logs
+                        </Link>
+                        <Link
+                          to="/food-logs"
+                          onClick={() => setIsDropdownOpen(false)}
+                          className="block px-4 py-2 text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition-colors"
+                        >
+                          Food Logs
+                        </Link>
+                      </div>
+                    )}
+                  </div>
+                </>
               )}
             </div>
           </div>

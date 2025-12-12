@@ -28,6 +28,7 @@ def create_app():
         symptoms_bp, 
         food_logs_bp, 
         treatments_bp,
+        labs_bp,
     )
     
     app.register_blueprint(auth_bp)
@@ -35,6 +36,7 @@ def create_app():
     app.register_blueprint(symptoms_bp)
     app.register_blueprint(food_logs_bp)
     app.register_blueprint(treatments_bp)
+    app.register_blueprint(labs_bp)
 
 
     # Create tables if they don't exist (dev convenience; migrations are preferred)
@@ -80,7 +82,7 @@ def create_app():
     @app.get("/")
     def root():
         return (
-            "Med Assist backend is running. Run React app via npm start, or append url with /api/<insert_route> to view backend API endpoints.",
+            "Med Assist backend is running. Run React app via npm start.",
             200,
             {"Content-Type": "text/plain; charset=utf-8"}
         )
