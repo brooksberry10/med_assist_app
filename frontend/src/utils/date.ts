@@ -22,10 +22,6 @@ export function formatDateForBackend(
     return null
   }
 
-  // Backend expects: "%b %d, %Y" (e.g., "Oct 24, 2025")
-  return date.toLocaleDateString('en-US', {
-    month: 'short',
-    day: '2-digit',
-    year: 'numeric',
-  })
+  // Backend expects ISO 8601 format (e.g., "2025-10-24T12:00:00Z")
+  return date.toISOString()
 }

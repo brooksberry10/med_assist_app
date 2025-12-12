@@ -19,7 +19,7 @@ class Treatments(db.Model):
         return {
             'treatment_id': self.treatment_id,
             'treatment_name': self.treatment_name,
-            'scheduled_on': self.scheduled_on,
+            'scheduled_on': self.scheduled_on.isoformat() if self.scheduled_on else None,
             'notes': self.notes,
             'is_completed': self.is_completed,
         }
