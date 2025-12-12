@@ -150,6 +150,8 @@ def export_data():
     if error:
         return error
     try:
+
+        #ill optimize the queries later
         user_info = UserInfo.query.filter_by(id=user.id).first()
         labs = Labs.query.filter_by(id = user.id).first()
         food_logs = FoodLog.query.filter_by(id = user.id).all()
@@ -165,7 +167,6 @@ def export_data():
                     'treatments': [treatment.to_dict() for treatment in treatments if treatments]
                     }
         
-        print(all_user_data)
         pdf_file = generate_pdf_file(all_user_data)
 
         
