@@ -1,5 +1,5 @@
 from marshmallow import (fields, Schema, validates, 
-                         validates_schema, ValidationError, validate)
+                         validates_schema, ValidationError, validate, EXCLUDE)
 from .models import Users
 
 
@@ -23,6 +23,8 @@ max_password_length = 64
 
 #Form for registration
 class RegistrationForm(Schema):
+    class Meta:
+        unknown = EXCLUDE
 
     first_name = fields.String(data_key='first_name',required=True, validate=[validate.Length(min =min_name_length, max=max_name_length,error=f"First name must be between {min_name_length} and {max_name_length} characters")])
     last_name = fields.String(data_key='last_name', validate=[validate.Length(max=max_name_length, error=f'Last name must be less than {max_name_length}')])
@@ -78,6 +80,9 @@ class UserSchema(Schema):
 
 
 class UserInfoForm(Schema):
+    class Meta:
+        unknown = EXCLUDE
+    
     #AGE
     min_age_range = 0
     max_age_range = 300
