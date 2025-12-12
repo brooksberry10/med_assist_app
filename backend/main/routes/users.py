@@ -69,10 +69,15 @@ def update_user_info(id):
     try:
         validated_data = form.load(json_data)
     except Exception as e:
-        error_msg = str(e)
         if hasattr(e, 'messages'):
-            error_msg = str(e.messages)
-        return jsonify({"error": f"Validation error: {error_msg}"}), 400
+            error_messages = []
+            for field, messages in e.messages.items():
+                if isinstance(messages, list):
+                    error_messages.extend(messages)
+                else:
+                    error_messages.append(str(messages))
+            return jsonify({"error": "\n".join(error_messages)}), 400
+        return jsonify({"error": str(e)}), 400
     
     try:
         if not user.user_info:
