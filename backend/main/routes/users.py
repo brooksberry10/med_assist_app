@@ -1,12 +1,59 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, send_file
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
-from ..models import Users, UserInfo
+from ..models import Users, UserInfo, FoodLog, Labs, DailySymptoms, Treatments
 from ..forms import UserInfoForm, ValidationError
 from .. import db
 
+from io import BytesIO
+from reportlab.pdfgen import canvas
+
 
 users_bp = Blueprint('users', __name__, url_prefix='/api')
+
+def generate_pdf_file(user_data):
+    buffer = BytesIO()
+    new_canvas = canvas.Canvas(buffer)
+
+    new_canvas.setFont('Helvetica-Bold', 26)
+    new_canvas.drawString(100,750, "Medical Data")
+
+    y = 700
+
+    categories = ['food_logs', 'symptoms','treatments']
+
+    if user_data:
+        for key, value in user_data.items():
+            new_canvas.setFont('Helvetica-Bold', 16)
+            new_canvas.drawString(100, y, f"{key.capitalize()}")
+            y-=25
+            if y < 50:
+                new_canvas.showPage()
+                y = 700
+            if value:
+                if key in categories:
+                    for list_item in value:
+                        y -=5
+                        for data_name,data in list_item.items():
+                            if 'id' not in data_name:
+                                new_canvas.setFont('Helvetica', 14)
+                                new_canvas.drawString(100, y, f"{data_name}: {data}")
+                                y -=15
+
+                if key not in categories:
+                    for data_name, data in value.items():
+                        if 'id' not in data_name:
+                            new_canvas.setFont('Helvetica', 14)
+                            new_canvas.drawString(100, y, f"{data_name}: {data}")
+                            y -=15
+            y -= 20
+   
+    
+    new_canvas.showPage()
+    new_canvas.save()
+
+    buffer.seek(0)
+    return buffer
 
 
 def verify_user_access(user_id):
@@ -126,3 +173,34 @@ def update_user_info(id):
         db.session.rollback()
         return jsonify({"error": f"Database error: {str(e)}"}), 500
 
+
+@users_bp.route('/user/export-data', methods = ['GET'])
+@jwt_required()
+def export_data():
+    user, error = verify_user_access(get_jwt_identity())
+    if error:
+        return error
+    try:
+
+        #ill optimize the queries later
+        user_info = UserInfo.query.filter_by(id=user.id).first()
+        labs = Labs.query.filter_by(id = user.id).first()
+        food_logs = FoodLog.query.filter_by(id = user.id).all()
+        symptoms = DailySymptoms.query.filter_by(id =user.id).all()
+        treatments = Treatments.query.filter_by(id = user.id).all()
+
+        all_user_data = {
+                    'person': {'first_name': user.first_name, 'last_name': user.last_name},
+                    'info': user_info.to_dict() if user_info else None,
+                    'labs': labs.to_dict() if labs else None,
+                    'food_logs': [log.to_dict() for log in food_logs if food_logs],
+                    'symptoms': [symptom.to_dict() for symptom in symptoms if symptoms],
+                    'treatments': [treatment.to_dict() for treatment in treatments if treatments]
+                    }
+        
+        pdf_file = generate_pdf_file(all_user_data)
+
+        
+        return send_file(pdf_file, as_attachment=False, download_name='Medical Data.pdf'), 200
+    except Exception:
+        return jsonify({'error': 'Error creating PDF file'}), 400

@@ -1,8 +1,8 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
-
+from backend.main import db
 from ..models import Users, FoodLog
-from ..forms import FoodLogForm
+from ..forms import FoodLogForm, ValidationError
 
 
 food_logs_bp = Blueprint('food_logs', __name__, url_prefix='/api/user/<int:id>')
@@ -92,4 +92,53 @@ def add_foodlog(id):
         
     except Exception:
         return jsonify({"error": "Failed to add food log"}), 500
+    
+
+@food_logs_bp.route('/food-logs/<int:foodlog_id>/edit', methods = ['PATCH'])
+@jwt_required()
+def edit_foodlog(id, foodlog_id):
+    user, error = verify_user_access(id)
+    if error:
+        return error
+
+    foodlog = FoodLog.query.get(foodlog_id)
+    if foodlog_id is None:
+        return jsonify({'error': 'Foodlog does not exist'}), 404
+    
+    data = request.get_json()
+    try:
+        validate = FoodLogForm.load(data, partial=True)
+    except ValidationError as error:
+        return jsonify({"error": error.messages}), 400
+    
+    try:
+        for field in ('breakfast','lunch','dinner','notes','total_calories','recorded_on'):
+            if field in validate:
+                setattr(foodlog, field, validate[field])
+
+        db.session.commit()
+        return jsonify({'message': 'Food Log updated successfully'}), 200
+    except Exception:
+        db.session.rollback()
+        return {"error": "Failed to update treatment"}, 500
+
+
+@food_logs_bp.route('/food-logs/<int:foodlog_id>/delete', methods = ['DELETE'])
+@jwt_required()
+def delete_foodlog(id, foodlog_id):
+    user, error = verify_user_access(id)
+    if error:
+        return error
+
+    foodlog = FoodLog.query.get(foodlog_id)
+    if foodlog is None:
+        return jsonify({'error': 'Food Log does not exist'}), 404
+    
+    try:
+        db.session.delete(foodlog)
+        db.session.commit()
+        return jsonify({'message':'Food Log deleted successfully'}), 200
+    except Exception:
+        return jsonify({'error': 'Failed to delete Food Log'}), 500
+    
 

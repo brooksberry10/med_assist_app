@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
-
+from backend.main import db
 from ..models import Users, DailySymptoms
 from ..forms import DailySymptomsForm, ValidationError
 
@@ -87,6 +87,57 @@ def add_symptoms(id):
         symptom.save()
         return jsonify({"message": "Symptom added successfully"}), 201
         
-    except Exception as e:
+    except Exception:
         return jsonify({"error": "Failed to log symptom"}), 500
+    
 
+
+@symptoms_bp.route('/symptom/<int:symptom_id>/delete', methods = ["DELETE"])
+@jwt_required()
+def delete_symptom(id, symptom_id):
+    user, error = verify_user_access(id)
+    if error:
+        return error
+    
+    symptom_query = DailySymptoms.query.get(symptom_id)
+
+    if symptom_query is None:
+        return jsonify({'error': 'Symptom not found'}), 404
+    
+    try:
+        db.session.delete(symptom_query)
+        db.session.commit()
+        return jsonify({'message', 'Symptom deleted successfully'}), 200
+    except Exception:
+        db.session.rollback()
+        return {"error": "Failed to delete symptom"}, 500
+    
+
+    
+@symptoms_bp.route('/symptom/<int:symptom_id>/edit', methods = ['PATCH'])
+@jwt_required()
+def edit_symptom(id, symptom_id):
+    user, error = verify_user_access(id)
+    if error:
+        return error
+    
+    symptom = DailySymptoms.query.get(symptom_id)
+    if symptom is None:
+        return jsonify({'error': 'Symptom not found'}), 404
+    
+    data = request.get_json()
+
+    try:
+        validate = DailySymptomsForm.load(data, partial=True)
+    except ValidationError as error:
+            return jsonify({"error": error.messages}), 400
+    
+    try:
+        for field in ('severity','type_of_symptom','weight_lbs','notes', 'recorded_on'):
+            if field in validate:
+                setattr(symptom, field, validate[field])
+        db.session.commit()
+        return {"message": "Symptom updated successfully"}, 200
+    except Exception:
+        db.session.rollback()
+        return {"error": "Failed to update treatment"}, 500
