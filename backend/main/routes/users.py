@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from ..models import Users, UserInfo
-from ..forms import UserInfoForm
+from ..forms import UserInfoForm, ValidationError
 from .. import db
 
 
@@ -54,6 +54,32 @@ def get_user_info(id):
     return jsonify({
         'user_info': user.user_info.to_dict() if user.user_info else None
     }), 200
+
+
+@users_bp.route('/user-account/<int:id>', methods=['PATCH'])
+@jwt_required()
+def update_user_account(id):
+    user, error = verify_user_access(id)
+    if error:
+        return error
+    
+    json_data = request.get_json() or {}
+    
+    try:
+        if 'email' in json_data:
+            existing_user = Users.query.filter_by(email=json_data['email']).first()
+            if existing_user and existing_user.id != id:
+                return jsonify({"error": "Email already exists"}), 400
+            user.email = json_data['email']
+        
+        db.session.commit()
+        return jsonify({
+            "message": "Account updated successfully",
+            "user": user.to_dict()
+        }), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": f"Database error: {str(e)}"}), 500
 
 
 @users_bp.route('/user-info/<int:id>', methods=['PATCH'])
