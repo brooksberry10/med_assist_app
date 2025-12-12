@@ -18,7 +18,7 @@ def verify_user_access(user_id):
     if not user:
         return None, ({"error": "User does not exist"}, 404)
     if user.id != current_user_id:
-        return None, ({"message": "Access Denied"}, 403)
+        return None, ({"error": "Access Denied"}, 403)
     return user, None
 
 

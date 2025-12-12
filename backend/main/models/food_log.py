@@ -26,6 +26,6 @@ class FoodLog(db.Model):
             'dinner': self.dinner,
             'notes': self.notes,
             'total_calories': self.total_calories,
-            'recorded_on': self.recorded_on
+            'recorded_on': self.recorded_on.isoformat() if self.recorded_on else None
         }
 
