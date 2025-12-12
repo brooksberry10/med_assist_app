@@ -2,11 +2,9 @@ import { useState, useEffect } from 'react'
 import AppNavbar from '../components/Navbar'
 import AppFooter from '../components/Footer'
 import AuthService from '../utils/auth'
-import { useNavigate } from 'react-router-dom'
 import toast, { Toaster } from 'react-hot-toast'
 
 export default function Profile() {
-  const navigate = useNavigate()
   const [userId, setUserId] = useState<number | null>(null)
   const [userInfo, setUserInfo] = useState({
     firstName: '',
@@ -57,20 +55,16 @@ export default function Profile() {
               setInsurance(data.user_info.insurance || '')
             }
           }
-        } else {
-          navigate('/signin')
         }
       } catch (error) {
-        console.error('Failed to fetch user:', error)
         toast.error('Failed to load profile data')
-        navigate('/signin')
       } finally {
         setLoadingUser(false)
       }
     }
 
     fetchUserData()
-  }, [navigate])
+  }, [])
 
   const handleUpdate = async (field: string) => {
     if (!userId) {
