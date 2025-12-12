@@ -101,26 +101,28 @@ def edit_foodlog(id, foodlog_id):
     if error:
         return error
 
-    foodlog = FoodLog.query.get(foodlog_id)
-    if foodlog_id is None:
+    foodlog = FoodLog.query.filter_by(id=id, foodlog_id=foodlog_id).first()
+    if foodlog is None:
         return jsonify({'error': 'Foodlog does not exist'}), 404
     
-    data = request.get_json()
+    data = request.get_json() or {}
+
+    schema = FoodLogForm(partial=True)
     try:
-        validate = FoodLogForm.load(data, partial=True)
+        validated = schema.load(data)
     except ValidationError as error:
         return jsonify({"error": error.messages}), 400
     
     try:
         for field in ('breakfast','lunch','dinner','notes','total_calories','recorded_on'):
-            if field in validate:
-                setattr(foodlog, field, validate[field])
+            if field in validated:
+                setattr(foodlog, field, validated[field])
 
         db.session.commit()
         return jsonify({'message': 'Food Log updated successfully'}), 200
     except Exception:
         db.session.rollback()
-        return {"error": "Failed to update treatment"}, 500
+        return jsonify({"error": "Failed to update treatment"}), 500
 
 
 @food_logs_bp.route('/food-logs/<int:foodlog_id>/delete', methods = ['DELETE'])
@@ -130,7 +132,7 @@ def delete_foodlog(id, foodlog_id):
     if error:
         return error
 
-    foodlog = FoodLog.query.get(foodlog_id)
+    foodlog = FoodLog.query.filter_by(id=id, foodlog_id=foodlog_id).first()
     if foodlog is None:
         return jsonify({'error': 'Food Log does not exist'}), 404
     

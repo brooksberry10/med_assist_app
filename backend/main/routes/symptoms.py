@@ -99,7 +99,7 @@ def delete_symptom(id, symptom_id):
     if error:
         return error
     
-    symptom_query = DailySymptoms.query.get(symptom_id)
+    symptom_query = DailySymptoms.query.filter_by(id=id, symptoms_id=symptom_id).first()
 
     if symptom_query is None:
         return jsonify({'error': 'Symptom not found'}), 404
@@ -107,7 +107,7 @@ def delete_symptom(id, symptom_id):
     try:
         db.session.delete(symptom_query)
         db.session.commit()
-        return jsonify({'message', 'Symptom deleted successfully'}), 200
+        return jsonify({'message': 'Symptom deleted successfully'}), 200
     except Exception:
         db.session.rollback()
         return {"error": "Failed to delete symptom"}, 500
@@ -121,23 +121,24 @@ def edit_symptom(id, symptom_id):
     if error:
         return error
     
-    symptom = DailySymptoms.query.get(symptom_id)
+    symptom = DailySymptoms.query.filter_by(id=id, symptoms_id=symptom_id).first()
     if symptom is None:
         return jsonify({'error': 'Symptom not found'}), 404
     
-    data = request.get_json()
+    data = request.get_json() or {}
 
+    schema = DailySymptomsForm(partial=True)
     try:
-        validate = DailySymptomsForm.load(data, partial=True)
+        validated = schema.load(data)
     except ValidationError as error:
             return jsonify({"error": error.messages}), 400
     
     try:
         for field in ('severity','type_of_symptom','weight_lbs','notes', 'recorded_on'):
-            if field in validate:
-                setattr(symptom, field, validate[field])
+            if field in validated:
+                setattr(symptom, field, validated[field])
         db.session.commit()
         return {"message": "Symptom updated successfully"}, 200
     except Exception:
         db.session.rollback()
-        return {"error": "Failed to update treatment"}, 500
+        return {"error": "Failed to update symptom"}, 500
