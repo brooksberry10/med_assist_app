@@ -130,7 +130,7 @@ class DailySymptomsForm(Schema):
 
     weight_lbs = fields.Float(data_key='weight_lbs',validate=validate.Range(min=0.0,max=max_weight_range, error=f'Weight must be between 0.0lb and {max_weight_range}lb'))
 
-    recorded_on = fields.DateTime(data_key='recorded_on', format='%b %d, %Y')
+    recorded_on = fields.DateTime(data_key='recorded_on')
 
     notes = fields.String(data_key='notes')
 
@@ -143,7 +143,7 @@ class TreatmentsForm(Schema):
     treatment_id = fields.Integer(data_key='treatment_id')
     treatment_name = fields.String(data_key='treatment_name', validate=validate.Length(max = max_length_treatment))
 
-    scheduled_on = fields.DateTime(data_key='scheduled_on',format='%b %d, %Y')
+    scheduled_on = fields.DateTime(data_key='scheduled_on')
 
     notes = fields.String(data_key='notes')
 
@@ -156,7 +156,7 @@ class FoodLogForm(Schema):
     lunch = fields.String(data_key='lunch')
     dinner = fields.String(data_key='dinner')
     total_calories = fields.Float(data_key='total_calories', validate=validate.Range(min = 0))
-    recorded_on = fields.DateTime(data_key='recorded_on', format='%b %d, %Y')
+    recorded_on = fields.DateTime(data_key='recorded_on')
 
 
 class LabsForm(Schema):

@@ -16,7 +16,7 @@ def verify_user_access(user_id):
         return None, (jsonify({"error": "User does not exist"}), 404)
     
     if current_user_id != user.id:
-        return None, (jsonify({"message": "Access Denied"}), 403)
+        return None, (jsonify({"error": "Access Denied"}), 403)
     
     return user, None
 

@@ -23,7 +23,7 @@ class DailySymptoms(db.Model):
             'severity': self.severity,
             'type_of_symptom': self.type_of_symptom,
             'weight_lbs': self.weight_lbs,
-            'recorded_on': self.recorded_on,
+            'recorded_on': self.recorded_on.isoformat() if self.recorded_on else None,
             'notes': self.notes
         }
 
