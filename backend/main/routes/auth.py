@@ -7,8 +7,9 @@ from flask_jwt_extended import (
     get_jwt_identity
 )
 
-from ..models import Users, TokenBlockList
-from ..forms import RegistrationForm, LoginFormEmail, LoginFormUsername, ValidationError
+from ..models import Users, TokenBlockList, UserInfo
+from ..forms import RegistrationForm, LoginFormEmail, LoginFormUsername, UserInfoForm, ValidationError
+from .. import db
 
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/api/auth')
@@ -16,10 +17,11 @@ auth_bp = Blueprint('auth', __name__, url_prefix='/api/auth')
 
 @auth_bp.route('/register', methods=['POST'])
 def register():
-    schema = RegistrationForm()
+    json_data = request.get_json()
+    user_schema = RegistrationForm()
 
     try:
-        validate = schema.load(request.get_json())
+        user_validate = user_schema.load(json_data)
     except ValidationError as error:
         error_messages = []
         for field, messages in error.messages.items():
@@ -27,18 +29,47 @@ def register():
                 error_messages.extend(messages)
             else:
                 error_messages.append(str(messages))
-        return jsonify({"error": " ".join(error_messages)}), 400
+        return jsonify({"error": "\n".join(error_messages)}), 400
 
-    user = Users(
-        first_name=validate['first_name'],
-        last_name=validate.get('last_name'),
-        username=validate['username'],
-        email=validate['email']
-    )
-    user.set_password(validate['password'])
-    user.save()
-    
-    return jsonify({"message": "User created successfully"}), 201
+    try:
+        user = Users(
+            first_name=user_validate['first_name'],
+            last_name=user_validate.get('last_name'),
+            username=user_validate['username'],
+            email=user_validate['email']
+        )
+        user.set_password(user_validate['password'])
+        db.session.add(user)
+        db.session.flush()
+
+        user_info_fields = ['age', 'gender', 'weight_lbs', 'height_ft', 'height_in', 
+                           'current_diagnoses', 'medical_history', 'insurance']
+        user_info_data = {k: v for k, v in json_data.items() if k in user_info_fields and v is not None}
+        
+        if user_info_data:
+            user_info_schema = UserInfoForm(partial=True)
+            try:
+                user_info_validate = user_info_schema.load(user_info_data)
+                user_info = UserInfo(
+                    id=user.id,
+                    age=user_info_validate.get('age', 0),
+                    gender=user_info_validate.get('gender', 'Other'),
+                    weight_lbs=user_info_validate.get('weight_lbs', 0.0),
+                    height_ft=user_info_validate.get('height_ft', 0),
+                    height_in=user_info_validate.get('height_in', 0),
+                    current_diagnoses=user_info_validate.get('current_diagnoses', ''),
+                    medical_history=user_info_validate.get('medical_history', ''),
+                    insurance=user_info_validate.get('insurance', '')
+                )
+                db.session.add(user_info)
+            except ValidationError:
+                pass
+
+        db.session.commit()
+        return jsonify({"message": "User created successfully"}), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": f"Failed to create user: {str(e)}"}), 500
 
 
 @auth_bp.route('/login-email', methods=['POST'])
