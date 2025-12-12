@@ -51,6 +51,7 @@ def get_all_foodlogs(id):
     foodlogs_all = foodlogs.paginate(
         page=page,
         per_page=per_page,
+        error_out=False
     )
 
     result = FoodLogForm().dump(foodlogs_all.items, many=True)
@@ -75,8 +76,9 @@ def add_foodlog(id):
         
         try:
             validate = schema.load(request.get_json())
-        except Exception as error:
-            return jsonify({"error": str(error)}), 400
+        except ValidationError as error:
+            return jsonify({"error": error.messages}), 400
+
         
         foodlog = FoodLog(
             id=id,
@@ -91,6 +93,7 @@ def add_foodlog(id):
         return jsonify({"message": "Food log added successfully"}), 201
         
     except Exception:
+        db.session.rollback()
         return jsonify({"error": "Failed to add food log"}), 500
     
 
@@ -122,7 +125,7 @@ def edit_foodlog(id, foodlog_id):
         return jsonify({'message': 'Food Log updated successfully'}), 200
     except Exception:
         db.session.rollback()
-        return jsonify({"error": "Failed to update treatment"}), 500
+        return jsonify({"error": "Failed to update food log"}), 500
 
 
 @food_logs_bp.route('/food-logs/<int:foodlog_id>/delete', methods = ['DELETE'])
@@ -141,6 +144,7 @@ def delete_foodlog(id, foodlog_id):
         db.session.commit()
         return jsonify({'message':'Food Log deleted successfully'}), 200
     except Exception:
+        db.session.rollback()
         return jsonify({'error': 'Failed to delete Food Log'}), 500
     
 

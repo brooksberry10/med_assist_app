@@ -48,7 +48,8 @@ def get_symptoms_all(id):
 
     symptoms = all_symptoms.paginate(
         page=page,
-        per_page=per_page
+        per_page=per_page,
+        error_out=False
     )
 
     result = DailySymptomsForm().dump(symptoms.items, many=True)
@@ -88,6 +89,7 @@ def add_symptoms(id):
         return jsonify({"message": "Symptom added successfully"}), 201
         
     except Exception:
+        db.session.rollback()
         return jsonify({"error": "Failed to log symptom"}), 500
     
 
@@ -110,7 +112,7 @@ def delete_symptom(id, symptom_id):
         return jsonify({'message': 'Symptom deleted successfully'}), 200
     except Exception:
         db.session.rollback()
-        return {"error": "Failed to delete symptom"}, 500
+        return jsonify({"error": "Failed to delete symptom"}), 500
     
 
     
@@ -138,7 +140,7 @@ def edit_symptom(id, symptom_id):
             if field in validated:
                 setattr(symptom, field, validated[field])
         db.session.commit()
-        return {"message": "Symptom updated successfully"}, 200
+        return jsonify({"message": "Symptom updated successfully"}), 200
     except Exception:
         db.session.rollback()
-        return {"error": "Failed to update symptom"}, 500
+        return jsonify({"error": "Failed to update symptom"}), 500
