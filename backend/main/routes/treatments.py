@@ -75,7 +75,7 @@ def create_treatment(id):
     json_data = request.get_json() or {}
     form = TreatmentsForm()
     try:
-        data = form.load(json_data)  # expects dates like "Oct 12, 2025"
+        data = form.load(json_data)  
     except Exception as e:
         # Marshmallow ValidationError produces .messages; avoid leaking internals
         msg = getattr(e, "messages", str(e))

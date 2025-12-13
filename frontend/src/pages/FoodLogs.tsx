@@ -4,6 +4,8 @@ import Footer from '../components/Footer'
 import toast, { Toaster } from 'react-hot-toast'
 import { useFoodlogs } from '../hooks/useFoodlogs'
 import type { FoodLog } from '../utils/api/foodlogs'
+import { parseDateInputToUtcDate, formatUtcDateForDateInput } from '../utils/date'
+
 
 function FoodLogs() {
     // >>> CRUD INTEGRATION
@@ -40,14 +42,8 @@ function FoodLogs() {
 
     setEditingFoodLog(log)
 
-    if (log.recorded_on) {
-      const year = log.recorded_on.getFullYear()
-      const month = String(log.recorded_on.getMonth() + 1).padStart(2, '0')
-      const day = String(log.recorded_on.getDate()).padStart(2, '0')
-      setFormDate(`${year}-${month}-${day}`)
-    } else {
-      setFormDate('')
-    }
+    setFormDate(formatUtcDateForDateInput(log.recorded_on))
+
 
     setFormBreakfast(log.breakfast ?? '')
     setFormLunch(log.lunch ?? '')
@@ -85,7 +81,8 @@ function FoodLogs() {
   const handleModalSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    const recordedDate = formDate.trim() !== '' ? new Date(formDate.trim()) : null
+    const recordedDate = parseDateInputToUtcDate(formDate.trim())
+
 
     const caloriesNum = Number(formCalories)
     if (Number.isNaN(caloriesNum) || caloriesNum < 0) {
