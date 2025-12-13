@@ -29,6 +29,8 @@ export default function Profile() {
   const [loadingPhysical, setLoadingPhysical] = useState(false)
   const [loadingMedical, setLoadingMedical] = useState(false)
   const [loadingInsurance, setLoadingInsurance] = useState(false)
+  const [downloadingPdf, setDownloadingPdf] = useState(false)
+
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -143,6 +145,51 @@ export default function Profile() {
       else if (field === 'insurance') setLoadingInsurance(false)
     }
   }
+  
+  const handleDownloadPdf = async () => {
+    try {
+      setDownloadingPdf(true)
+
+      const response = await AuthService.authenticatedFetch('/api/user/export-data', {
+        method: 'GET',
+      })
+
+      if (!response.ok) {
+        let message = 'Failed to download PDF'
+        try {
+          const data = await response.json()
+          if ((data as any)?.error) {
+            message = (data as any).error
+          }
+        } catch {
+          // ignore JSON parse error
+        }
+        toast.error(message)
+        return
+      }
+
+      const blob = await response.blob()
+      const url = window.URL.createObjectURL(blob)
+
+      const link = document.createElement('a')
+      link.href = url
+      link.download = 'medical-data.pdf'
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+      window.URL.revokeObjectURL(url)
+
+      toast.success('PDF downloaded')
+    } catch (err) {
+      console.error(err)
+      toast.error('Failed to download PDF')
+    } finally {
+      setDownloadingPdf(false)
+    }
+  }
+
+
+
 
   if (loadingUser) {
     return (
@@ -392,6 +439,23 @@ export default function Profile() {
                 ) : (
                   'Update'
                 )}
+              </button>
+            </div>
+            {/* export data */}
+            <div className="bg-white rounded-xl shadow-lg p-6 md:col-span-2">
+              <h3 className="text-2xl font-bold text-purple-800 mb-3">
+                Export Your Data
+              </h3>
+              <p className="text-gray-600 mb-4">
+                Download a PDF summary of your profile, labs, food logs, symptoms, and treatments.
+              </p>
+
+              <button
+                onClick={handleDownloadPdf}
+                disabled={downloadingPdf}
+                className="w-full md:w-auto px-6 py-2.5 rounded-lg bg-gradient-to-r from-purple-700 to-indigo-600 text-white font-semibold shadow-md hover:from-purple-800 hover:to-indigo-700 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center"
+              >
+                {downloadingPdf ? 'Preparing PDF…' : 'Download Medical Data PDF'}
               </button>
             </div>
 
