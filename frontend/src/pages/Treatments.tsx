@@ -4,6 +4,7 @@ import Footer from '../components/Footer'
 import { useTreatments } from '../hooks/useTreatments'
 import type { Treatment } from '../utils/api/treatments'
 import toast, { Toaster } from 'react-hot-toast'
+import { parseDateInputToUtcDate, formatUtcDateForDateInput } from '../utils/date'
 
 
 function Treatments() {
@@ -49,14 +50,7 @@ function Treatments() {
     setFormNotes(treatment.notes ?? '')
     setFormCompleted(treatment.is_completed)
 
-    if (treatment.scheduled_on) {
-      const year = treatment.scheduled_on.getFullYear()
-      const month = String(treatment.scheduled_on.getMonth() + 1).padStart(2, '0')
-      const day = String(treatment.scheduled_on.getDate()).padStart(2, '0')
-      setFormDate(`${year}-${month}-${day}`)
-    } else {
-      setFormDate('')
-    }
+    setFormDate(formatUtcDateForDateInput(treatment.scheduled_on))
   }
 
 
@@ -127,8 +121,7 @@ function Treatments() {
       return
     }
 
-    const scheduledDate =
-      formDate.trim() !== '' ? new Date(formDate.trim()) : null
+    const scheduledDate = parseDateInputToUtcDate(formDate.trim())
 
     setSubmitting(true)
 

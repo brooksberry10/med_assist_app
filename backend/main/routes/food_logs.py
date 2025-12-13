@@ -86,7 +86,8 @@ def add_foodlog(id):
             lunch=validate.get('lunch'),
             dinner=validate.get('dinner'),
             notes=validate.get('notes'),
-            total_calories=validate.get('total_calories', 0.0)
+            total_calories=validate.get('total_calories', 0.0),
+            recorded_on=validate.get('recorded_on'),
         )
         
         foodlog.save()
