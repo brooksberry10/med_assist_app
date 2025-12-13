@@ -82,7 +82,8 @@ def add_symptoms(id):
             severity=validate.get('severity'),
             type_of_symptom=validate.get('type_of_symptom'),
             weight_lbs=validate.get('weight_lbs'),
-            notes=validate.get('notes')
+            notes=validate.get('notes'),
+            recorded_on=validate.get('recorded_on'),
         )
         
         symptom.save()
